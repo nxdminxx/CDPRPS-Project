@@ -32,6 +32,7 @@ public class AssignPatientController {
         model.addAttribute("doctor",doctor);
         return "assignpatient";
     }
+
     @PostMapping("/assigntoDoctor")
     public String AssigntoDoctor(Model model, @RequestParam (value= "patientId")String patientID) throws ExecutionException, InterruptedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -44,6 +45,7 @@ public class AssignPatientController {
         model.addAttribute("doctor",doctor);
         return "assignpatient";
     }
+
     @PutMapping("/unassignDoctor")
     public String UnassignDoctor(Model model,@RequestParam (value="patientId")String patientID) throws ExecutionException, InterruptedException {
 
@@ -58,6 +60,7 @@ public class AssignPatientController {
         return "assignpatient";
 
     }
+    
     @PostMapping("/releasepatient")
     public String ReleasePatient(Model model,@RequestParam (value ="patientId")String patientID) throws ExecutionException, InterruptedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

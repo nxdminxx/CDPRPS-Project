@@ -10,9 +10,9 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class AssignPatientServices {
+
     private final SHSRDAO<Patient> patientRepository;
     private final SHSRDAO<Doctor> doctorRepository;
-
 
     public AssignPatientServices(SHSRDAO<Patient> patientRepository, SHSRDAO<Doctor> doctorRepository) {
         this.patientRepository = patientRepository;
@@ -29,13 +29,16 @@ public class AssignPatientServices {
         }
         return patients;
     }
+
     public Doctor getDoctor(String drID) throws ExecutionException, InterruptedException {
 
         return doctorRepository.get(drID);
     }
+
     public Patient getPatient(String patientID) throws ExecutionException, InterruptedException {
         return patientRepository.get(patientID);
     }
+
     public void AssignPatient(String patientId,String doctorId) throws ExecutionException, InterruptedException {
         Doctor doctor=doctorRepository.get(doctorId);
         Patient patient=patientRepository.get(patientId);
@@ -43,12 +46,14 @@ public class AssignPatientServices {
         patient.setStatus("Under Surveillance");
         patientRepository.update(patient);
     }
+
     public void UnassignDoctor(String patientId,String doctorId) throws ExecutionException, InterruptedException {
         Doctor doctor=doctorRepository.get(doctorId);
         Patient patient=patientRepository.get(patientId);
         patient.setAssigned_doctor("");
         patientRepository.update(patient);
     }
+    
     public void ReleasePatient(String patientId,String doctorId) throws ExecutionException, InterruptedException {
         Doctor doctor=doctorRepository.get(doctorId);
         Patient patient=patientRepository.get(patientId);

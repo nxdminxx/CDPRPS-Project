@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class MedicineService {
+    
     private final SHSRDAO<Medicine> MedicineRepository;
 
     public MedicineService() {

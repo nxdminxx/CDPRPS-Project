@@ -38,11 +38,6 @@ public class HealthStatusService {
 
     public String deleteHealthStatus(String healthStatusId, String patientId) throws ExecutionException, InterruptedException {
             return healthStatusRepository.delete(healthStatusId, patientId);
-    }
-
-    // faruq
-    
-
-   
+    }   
 
 }

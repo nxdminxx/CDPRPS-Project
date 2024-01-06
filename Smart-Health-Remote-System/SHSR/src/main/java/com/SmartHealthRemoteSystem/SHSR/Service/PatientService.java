@@ -92,6 +92,4 @@ public class PatientService {
     public List<Patient> getPatientList() throws ExecutionException, InterruptedException {
         return patientRepository.getAll();
     }
-
-
 }

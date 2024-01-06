@@ -92,7 +92,6 @@ public class SendPrescriptionController {
         model.addAttribute("medicineList", medicineList);
         return "sendPrescriptionForm";
     }
-    
 
    /*  @PostMapping("/add-medicine/sendToPatient")
     public String submitPatientMedicine(Model model,

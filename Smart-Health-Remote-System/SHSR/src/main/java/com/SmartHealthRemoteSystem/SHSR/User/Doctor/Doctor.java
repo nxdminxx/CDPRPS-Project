@@ -3,6 +3,7 @@ package com.SmartHealthRemoteSystem.SHSR.User.Doctor;
 import com.SmartHealthRemoteSystem.SHSR.User.User;
 
 public class Doctor extends User {
+    
     private String hospital;
     private String position;
     // image
