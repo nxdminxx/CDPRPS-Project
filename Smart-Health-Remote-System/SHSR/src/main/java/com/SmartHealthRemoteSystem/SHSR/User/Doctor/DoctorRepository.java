@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 @Repository
 public class DoctorRepository implements SHSRDAO<Doctor> {
+    
     public static final String COL_NAME = "Doctor";
     public final UserRepository userRepository;
 

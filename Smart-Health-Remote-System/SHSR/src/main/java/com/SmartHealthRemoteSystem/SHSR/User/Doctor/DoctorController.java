@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/doctor")
 @Controller
 public class DoctorController {
+
     private final DoctorService doctorService;
 
     @Autowired
@@ -98,13 +99,12 @@ public class DoctorController {
         return "myPatient";
     }
 
-
     @GetMapping("/sensorDashboard")
     public String getSensorDashboard(Model model, @RequestParam(value= "patientId") String patientId) throws Exception {
         Firestore firestore = FirestoreClient.getFirestore();
-          Patient patient = doctorService.getPatient(patientId);
-          SensorDataService sensorDataService = new SensorDataService();
-          SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
+        Patient patient = doctorService.getPatient(patientId);
+        SensorDataService sensorDataService = new SensorDataService();
+        SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
         
           Query query = firestore.collection("SensorData")
           .document(patient.getSensorDataId())
@@ -117,13 +117,13 @@ public class DoctorController {
             highestDocumentNumber = documents.get(0).getLong("#").intValue();
           }
           
-          // Create a new document with the next document number
+        // Create a new document with the next document number
           DocumentReference docRef = firestore.collection("SensorData")
           .document(patient.getSensorDataId())
           .collection("SensorDataHistory")
           .document("sensordata" + String.format("%03d", highestDocumentNumber + 1));
   
-    // Populate the document with the sensor data fields
+        // Populate the document with the sensor data fields
           Map<String, Object> data = new HashMap<>();
           data.put("#", highestDocumentNumber +1 );
           data.put("Heart_Rate", sensorData.getHeart_Rate());
@@ -175,7 +175,7 @@ public class DoctorController {
         DocumentReference docRef = firestore.collection("SensorData").document(sensordata);
         DocumentReference patientRef = firestore.collection("Patient").document(patientid);
 
-  // Populate the document with the sensor data fields
+        // Populate the document with the sensor data fields
         Map<String, Object> data = new HashMap<>();
         data.put("Heart_Rate", 0);
         data.put("bodyTemperature", 0);
@@ -216,13 +216,13 @@ public class DoctorController {
             highestDocumentNumber = documents.get(0).getLong("#").intValue();
           }
           
-          // Create a new document with the next document number
+            // Create a new document with the next document number
           DocumentReference docRef = firestore.collection("SensorData")
           .document(patient.getSensorDataId())
           .collection("SensorDataHistory")
           .document("sensordata" + String.format("%03d", highestDocumentNumber + 1));
   
-    // Populate the document with the sensor data fields
+            // Populate the document with the sensor data fields
           Map<String, Object> data = new HashMap<>();
           data.put("#", highestDocumentNumber +1 );
           data.put("Heart_Rate", sensorData.getHeart_Rate());
@@ -313,36 +313,36 @@ public class DoctorController {
     doctor.setProfilePicture(Base64.getEncoder().encodeToString(profilePicture.getBytes()));
     doctorService.updateDoctor(doctor);
     return "redirect:/doctor/updateProfile";
-}
+    }
 
-@Autowired
-private SensorDataRepository sensorDataRepository;
+    @Autowired
+    private SensorDataRepository sensorDataRepository;
 
-@GetMapping("/sensorDataList")
-public String getSensorDataList(Model model) throws ExecutionException, InterruptedException {
-    List<SensorData> sensorDataList = sensorDataRepository.getAll();
-    model.addAttribute("sensorDataList", sensorDataList);
-    return "sensorDataList";
-}
+    @GetMapping("/sensorDataList")
+    public String getSensorDataList(Model model) throws ExecutionException, InterruptedException {
+        List<SensorData> sensorDataList = sensorDataRepository.getAll();
+        model.addAttribute("sensorDataList", sensorDataList);
+        return "sensorDataList";
+    }
 
-@GetMapping("/sensorHistory")
-    public String getHistory(Model model, @RequestParam String patientId) throws Exception, InterruptedException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
-        Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
-        
-        Patient patient = doctorService.getPatient(patientId);
-        SensorDataService sensorDataService = new SensorDataService();
-        model.addAttribute("patientid",patientId);
-        
-    //--------------IZZAT-----------------------------------------
-    //if there is no sensor id, will not call sensor data class
-        if(patient.getSensorDataId().isEmpty()){
-            return "HistorysensorDashboard";  
-          }
-        SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
-        model.addAttribute("sensorDataList",sensorData);
-        return "HistorysensorDashboard";
+    @GetMapping("/sensorHistory")
+        public String getHistory(Model model, @RequestParam String patientId) throws Exception, InterruptedException {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
+            Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
+            
+            Patient patient = doctorService.getPatient(patientId);
+            SensorDataService sensorDataService = new SensorDataService();
+            model.addAttribute("patientid",patientId);
+            
+        //--------------IZZAT-----------------------------------------
+        //if there is no sensor id, will not call sensor data class
+            if(patient.getSensorDataId().isEmpty()){
+                return "HistorysensorDashboard";  
+            }
+            SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
+            model.addAttribute("sensorDataList",sensorData);
+            return "HistorysensorDashboard";
     }
 
 }

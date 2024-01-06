@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class DoctorService {
+
     private final SHSRDAO<Doctor> doctorRepository;
     private final SHSRDAO<Patient> patientRepository;
     private final SHSRDAO<User> userRepository;
@@ -74,7 +75,6 @@ public class DoctorService {
         return doctorRepository.getAll();
     }
 
-
     public String deleteDoctor(String doctorId) throws ExecutionException, InterruptedException {
         return doctorRepository.delete(doctorId);
     }
@@ -91,6 +91,7 @@ public class DoctorService {
         }
         return patientList;
     }
+    
     public List<Patient> getListPatient() throws ExecutionException, InterruptedException {
         //function to return list of unassigned patient
         List<Patient> patients=patientRepository.getAll();
