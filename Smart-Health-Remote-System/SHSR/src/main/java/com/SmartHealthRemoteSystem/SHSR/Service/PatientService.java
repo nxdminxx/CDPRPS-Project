@@ -35,7 +35,7 @@ public class PatientService {
     public String createPatient(Patient patient) throws ExecutionException, InterruptedException {
         boolean checkUserExist = false;
         //Create a temporary User
-        User user = new User(patient.getUserId(), patient.getName(), patient.getPassword(), patient.getContact(), patient.getRole());
+        User user = new User(patient.getUserId(), patient.getName(), patient.getPassword(), patient.getContact(), patient.getRole(), patient.getEmail());
         //get list of all user
         List<User> userList = userRepository.getAll();
         for(User u: userList){
@@ -83,7 +83,7 @@ public class PatientService {
         }
 
         return prescription;
-    }
+    } 
 
     public List<Prescription> getAllPrescription(String patientId) throws ExecutionException, InterruptedException {
         return prescriptionRepository.getAll(patientId);

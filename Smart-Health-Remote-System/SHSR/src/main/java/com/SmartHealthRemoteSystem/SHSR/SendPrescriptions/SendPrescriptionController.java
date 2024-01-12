@@ -46,7 +46,8 @@ public class SendPrescriptionController {
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
 
-        List<Medicine> medicineList = medicineService.getListMedicine();
+        List<Medicine> medicineList = medicineService.getListMedicine(); //tukar utk dptkan stock medicine list
+
         model.addAttribute("patientName", patientService.getPatient(patientId).getName());
         model.addAttribute("patientId", patientId);
         model.addAttribute("doctor",doctor);
@@ -55,73 +56,44 @@ public class SendPrescriptionController {
         return "sendPrescriptionForm";
     }
 
-    @GetMapping("/add-medicine")
+    @GetMapping("/add-prescription")
     public String addMedication(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
 
-        List<Medicine> medicineList = medicineService.getListMedicine();
+        List<Medicine> medicineList = medicineService.getListMedicine(); //new method for patientMedicine
+    
         model.addAttribute("patientName", patientService.getPatient(patientId).getName());
         model.addAttribute("patientId", patientId);
         model.addAttribute("doctor",doctor);
         model.addAttribute("medicineList", medicineList);
-        return "addMedicine";
+        return "patientMedicine";
     }
 
-    @PostMapping("/add-medicine/submit")
-    public String sumbitMedicineForm(Model model,@RequestParam String patientId, @RequestParam(value = "addMed") String addMed, @RequestParam(value = "quantity") int quantity) 
+    @PostMapping("/add-prescription/submit")
+    public String submitMedicineForm(Model model,
+            @RequestParam String patientId,
+            @RequestParam String addMed,
+            @RequestParam int quantity) 
             throws ExecutionException, InterruptedException {
-
+    
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
+        MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
-
-        Medicine medicine1 = new Medicine(addMed, quantity);
-        //Medicine medicine2 = new Medicine(quantity);
-        medicineService.createMedicine(medicine1);
-        //medicineService.createMedicine(medicine2);
-
-        System.out.println("patient id before: "+patientId);
-
-        List<Medicine> medicineList = medicineService.getListMedicine();
+    
+        medicineService.prescribeMedicine(addMed, quantity, patientId);
+    
+        List<Medicine> prescribeList = medicineService.getListPrescribe(patientId);
         
         model.addAttribute("patientName", patientService.getPatient(patientId).getName());
         model.addAttribute("patientId", patientId);
-        model.addAttribute("doctor",doctor);
-        model.addAttribute("medicineList", medicineList);
-        return "sendPrescriptionForm";
+        model.addAttribute("doctor", doctor);
+        model.addAttribute("prescribeList", prescribeList);
+        
+        // Redirect to the prescription form with the patientId parameter
+        return "redirect:/prescription/form?patientId=" + patientId;
     }
-    
-
-   /*  @PostMapping("/add-medicine/sendToPatient")
-    public String submitPatientMedicine(Model model,
-                                         @RequestParam(value = "patientId") String patientId,
-                                         @RequestParam(value = "doctorId") String doctorId,
-                                         @RequestParam(value = "prescription") String prescription,
-                                         @RequestParam(value = "diagnosisAilment") String diagnosisAilment,
-                                         @RequestParam(value = "medicine") List<String> medicineList)
-            throws ExecutionException, InterruptedException {
-        if(medicineList.size()==0){
-            //default value if user didn't input any list of medicine
-        }else{
-            //if user input any medicine in the list
-            //shift to the left by 1 index
-            medicineList.remove(0);
-
-        }
-       /*  Medicine medicine1 = new Medicine(medicineList); 
-
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
-        Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
-        List<Patient> patientList = doctorService.findAllPatientAssignToDoctor(doctor.getUserId());
-        model.addAttribute("patientList", patientList);
-        model.addAttribute("doctor",doctor);
-        // String timeCreated = prescriptionService.createPrescription(prescription1,patientId);
-        return "sendPrescriptionForm";
-    } */
 
     @PostMapping("/form/submit")
     public String submitPrescriptionForm(Model model,
@@ -131,14 +103,7 @@ public class SendPrescriptionController {
                                          @RequestParam(value = "diagnosisAilment") String diagnosisAilment,
                                          @RequestParam(value = "patientMedList") List<String> patientMedList)
             throws ExecutionException, InterruptedException {
-        /* if(medicineList.size()==0){
-            //default value if user didn't input any list of medicine
-        }else{
-            //if user input any medicine in the list
-            //shift to the left by 1 index
-            medicineList.remove(0);
 
-        } */
 
         System.out.println("patient id before"+patientId);
         
@@ -157,6 +122,13 @@ public class SendPrescriptionController {
         String timeCreated = prescriptionService.createPrescription(prescription1,patientId);
         System.out.println("patient id after"+patientId);
         return "myPatient";
+    }
+
+    @GetMapping("/history")
+    public String viewPrescriptionHistory(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
+        List<Prescription> prescriptionHistory = prescriptionService.getListPrescription(patientId);
+        model.addAttribute("prescriptionHistory", prescriptionHistory);
+        return "prescriptionHistory";
     }
 
 }

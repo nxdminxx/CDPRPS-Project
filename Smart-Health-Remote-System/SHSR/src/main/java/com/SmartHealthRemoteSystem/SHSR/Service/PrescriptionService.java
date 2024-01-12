@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class PrescriptionService {
+    
     private final SubCollectionSHSRDAO<Prescription> prescriptionRepository;
     // private final SHSRDAO<Prescription> prescriptionRepository;
 
@@ -29,6 +30,7 @@ public class PrescriptionService {
     public Prescription getPrescription(String prescriptionIdId, String patientId) throws ExecutionException, InterruptedException {
         return prescriptionRepository.get(prescriptionIdId, patientId);
     }
+    
     public List<Prescription> getListPrescription(String patientId) throws ExecutionException, InterruptedException {
         return prescriptionRepository.getAll(patientId);
     }

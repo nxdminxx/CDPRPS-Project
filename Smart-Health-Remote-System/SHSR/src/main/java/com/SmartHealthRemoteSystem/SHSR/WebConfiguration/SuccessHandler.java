@@ -29,6 +29,9 @@ public class SuccessHandler implements AuthenticationSuccessHandler {
             } else if (grantedAuthority.getAuthority().equals("ROLE_PATIENT")) {
                 redirectUrl = "/patient";
                 break;
+            } else if (grantedAuthority.getAuthority().equals("ROLE_PHARMACIST")) {
+                redirectUrl = "/pharmacist";
+                break;
             } else{
                 redirectUrl = "/admin";
                 break;

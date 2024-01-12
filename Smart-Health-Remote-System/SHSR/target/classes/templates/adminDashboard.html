@@ -36,22 +36,23 @@
         </div>
         <div class="admin_main_content col-10">
             <h4>Table List of user</h4>
-            <span th:if="${errorMsg}"  th:text="${errorMsg}" class="text-danger"></span>
-            <span th:if="${message}"  th:text="${message}" class="text-danger"></span>
+            <p class="update-timestamp">Last Update = <span th:if="${message}" th:text="${message}" class="btn-message"></span> </p>
             <div class="admin_user_table ">
                 <div class="admin_table_nav">
                     <div>
                         <button type="button" class="patientBtn admin_navBtn admin_navBtn_active">Patient</button>
                         <button type="button" class="doctorBtn admin_navBtn">Doctor</button>
                         <button type="button" class="adminBtn admin_navBtn">Admin</button>
-                        
+                        <button type="button" class="pharmacistBtn admin_navBtn">Pharmacist</button>
+
                         <button type="button" class="asspatBtn admin_navBtn">Assigned Patient</button>
                         
                     </div>
                 </div>
                 <hr class="admin_line">
-                <!--patient table-->
-                <div class="user_table tableActive">
+
+                 <!--patient table-->
+                 <div class="user_table tableActive">
                     <table class="table table table-striped">
                         <thead>
                         <tr>
@@ -59,6 +60,7 @@
                             <th scope="col">User Id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Contact No</th>
+                            <th scope="col">Email</th>
                             
                             <th scope="col">Role</th>
                             <th scope="col">Emergency contact</th>
@@ -75,6 +77,7 @@
                             <td th:text="${patient.userId}"></td>
                             <td th:text="${patient.name}"></td>
                             <td th:text="${patient.contact}"></td>
+                            <td th:text="${patient.email}"></td>
                             
                             <td th:text="${patient.role}"></td>
                             <td th:text="${patient.emergencyContact}"></td>
@@ -90,8 +93,8 @@
                     </table>
                 </div>
 
-                <!--doctor table-->
-                <div class="user_table">
+                 <!--doctor table-->
+                 <div class="user_table">
                     <table class="table table table-striped">
                         <thead>
                         <tr>
@@ -99,6 +102,7 @@
                             <th scope="col">User Id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Contact No</th>
+                            <th scope="col">Email</th>
                            
                             <th scope="col">Role</th>
                             <th scope="col">Hospital</th>
@@ -113,12 +117,51 @@
                             <td th:text="${doctor.userId}"></td>
                             <td th:text="${doctor.name}"></td>
                             <td th:text="${doctor.contact}"></td>
+                            <td th:text="${doctor.email}"></td>
                            
                             <td th:text="${doctor.role}"></td>
                             <td th:text="${doctor.hospital}"></td>
                             <td th:text="${doctor.position}"></td>
                             <td>
                                 <button type="button" class="btn btn-warning editUserBtn editDoctor">Edit</button>
+                                <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                 <!--pharmacist table-->
+                 <div class="user_table">
+                    <table class="table table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">No</th>
+                            <th scope="col">User Id</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Contact No</th>
+                            <th scope="col">Email</th>
+
+                            <th scope="col">Role</th>
+                            <th scope="col">Hospital</th>
+                            <th scope="col">Position</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="pharmacistTable">
+                        <!--javascript retrieving all the data from database-->
+                        <tr th:each="pharmacist : ${pharmacistList}">
+                            <th scope="row" th:text="${pharmacistStat.index}+1"></th>
+                            <td th:text="${pharmacist.userId}"></td>
+                            <td th:text="${pharmacist.name}"></td>
+                            <td th:text="${pharmacist.contact}"></td>
+                            <td th:text="${pharmacist.email}"></td>
+
+                            <td th:text="${pharmacist.role}"></td>
+                            <td th:text="${pharmacist.hospital}"></td>
+                            <td th:text="${pharmacist.position}"></td>
+                            <td>
+                                <button type="button" class="btn btn-warning editUserBtn editPharmacist">Edit</button>
                                 <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
                             </td>
                         </tr>
@@ -135,7 +178,8 @@
                             <th scope="col">User Id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Contact No</th>
-                            
+                            <th scope="col">Email</th>
+
                             <th scope="col">Role</th>
                             <th scope="col">Action</th>
                         </tr>
@@ -147,7 +191,8 @@
                             <td th:text="${admin.userId}"></td>
                             <td th:text="${admin.name}"></td>
                             <td th:text="${admin.contact}"></td>
-                            
+                            <td th:text="${admin.email}"></td>
+
                             <td th:text="${admin.role}"></td>
                             <td>
                                 <button type="button" class="btn btn-warning editUserBtn editAdmin">Edit</button>
@@ -157,6 +202,7 @@
                         </tbody>
                     </table>
                 </div>
+
                  <!--Assigned Patient table-->
                  <div class="user_table">
                     <table class="table table table-striped">
@@ -193,7 +239,7 @@
             <div class="add_user_page-content">
                 <h4 class="add_user_page-title">User Form</h4>
                 <h4 class="add_user_page-title">Update User</h4>
-                <form th:action="@{/admin/adduser}"  method="post" name="addUserForm" id="addUserForm">
+                <form th:action="@{/admin/adduser}"  method="post" name="adduser" id="adduser">
                     <input type="hidden" class="form-control" id="action" name="action" >
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -205,12 +251,21 @@
                             <label for="userFullName">Name</label>
                             <input type="text" class="form-control" id="userFullName" name="userFullName" placeholder="Full name">
                         </div>
+                        <div class="form-group col-md-6">
+                            <label for="user">Password</label>
+                            <input type="text" class="form-control" id="userPassword" name="userPassword" placeholder="User Temp Password">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="user">Email</label>
+                            <input type="text" class="form-control" id="userEmail" name="userEmail" placeholder="User Email">
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="contact">Contact</label>
                         <input type="text" class="form-control" id="contact" name="contact" placeholder="012-3456789">
                     </div>
+                    
                     <div class="d-flex justify-content-around pt-2 pb-2">
                         <div class="form-check radioBtn">
                             <input class="form-check-input admin" type="radio" name="role" id="admin" value="ADMIN"
@@ -230,6 +285,12 @@
                             <input class="form-check-input doctor" type="radio" name="role" id="doctor" value="DOCTOR">
                             <label class="form-check-label" for="doctor">
                                 Doctor
+                            </label>
+                        </div>
+                        <div class="form-check radioBtn">
+                            <input class="form-check-input pharmacist" type="radio" name="role" id="pharmacist" value="PHARMACIST">
+                            <label class="form-check-label" for="pharmacist">
+                                Pharmacist
                             </label>
                         </div>
                     </div>
@@ -253,7 +314,7 @@
                     <div class="extraForm form-group">
                         <div class="form-group">
                             <label for="hospital">Hospital</label>
-                            <input type="text" class="form-control" id="hospital" name="hospital"
+                            <input type="text" class="form-control" id="doctorHospital" name="doctorHospital"
                                    placeholder="Current Hospital">
                         </div>
                         <div class="form-group">
@@ -262,11 +323,29 @@
                                    placeholder="Medical officer">
                         </div>
                     </div>
-                </form>
+
+                    <div class="extraForm form-group">
+                        <div class="form-group">
+                            <label for="hospital">Hospital</label>
+                            <input type="text" class="form-control" id="pharmacistHospital" name="pharmacistHospital"
+                                   placeholder="Current Hospital">
+                        </div>
+                        <div class="form-group">
+                            <label for="pharmacistPosition">Position</label>
+                            <input type="text" class="form-control" id="pharmacistPosition" name="pharmacistPosition"
+                                   placeholder="Medical officer">
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+                
                 <div class="add_user_page-buttons">
                     <button type="button" class="btn btn-primary confirmBtn" id="confirmAddUserBtn">Confirm</button>
                     <button type="button" class="btn btn-secondary" id="cancelBtnAddUser">Cancel</button>
                 </div>
+
+            </form>
             </div>
         </div>
 
@@ -289,8 +368,9 @@
             </div>
         </div>
     </div>
-
+    
 </div>
+
 <script th:src="@{/js/adminDashboard.js}"></script>
 </body>
 </html>

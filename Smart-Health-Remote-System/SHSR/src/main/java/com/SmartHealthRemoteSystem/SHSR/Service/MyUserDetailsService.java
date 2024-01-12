@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
+    
     private UserRepository userRepository;
 
     @Autowired
@@ -27,7 +28,12 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         // user from firestore database
         Optional<User> user = Optional.ofNullable(userRepository.get(userName));
-        user.orElseThrow(() -> new UsernameNotFoundException("Not found: " + userName));
-        return user.map(MyUserDetails::new).get();
+        if (user.isPresent()) {
+            System.out.println("User found in the database: " + userName);
+            return user.map(MyUserDetails::new).get();
+        } else {
+            System.out.println("User not found in the database: " + userName);
+            throw new UsernameNotFoundException("Not found: " + userName);
+        }
     }
 }

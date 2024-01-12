@@ -12,12 +12,12 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Repository;
 
-
 import javax.print.Doc;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 @Repository
 public class DoctorRepository implements SHSRDAO<Doctor> {
+    
     public static final String COL_NAME = "Doctor";
     public final UserRepository userRepository;
 
@@ -42,6 +42,7 @@ public class DoctorRepository implements SHSRDAO<Doctor> {
             tempDoctor.setPassword(user.getPassword());
             tempDoctor.setContact(user.getContact());
             tempDoctor.setRole(user.getRole());
+            tempDoctor.setEmail(user.getEmail());
             return tempDoctor;
         } else {
             return null;
@@ -68,6 +69,7 @@ public class DoctorRepository implements SHSRDAO<Doctor> {
             doctor.setName(user.getName());
             doctor.setContact(user.getContact());
             doctor.setRole(user.getRole());
+            doctor.setEmail(user.getEmail());
             doctorList.add(doctor);
         }
 
@@ -86,7 +88,7 @@ public class DoctorRepository implements SHSRDAO<Doctor> {
         tempDoctor.put("profilePicture", doctor.getProfilePicture());
 
         //Create User object and save it to database
-        User user = new User(doctor.getUserId(), doctor.getName(), doctor.getPassword(), doctor.getContact(), doctor.getRole());
+        User user = new User(doctor.getUserId(), doctor.getName(), doctor.getPassword(), doctor.getContact(), doctor.getRole(), doctor.getEmail());
         userRepository.save(user);
 
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_NAME).document(doctor.getUserId()).set(tempDoctor);
@@ -111,7 +113,7 @@ public class DoctorRepository implements SHSRDAO<Doctor> {
     if(!(doctor.getProfilePicture().isEmpty())){
         dbFirestore.collection(COL_NAME).document(doctor.getUserId()).update("profilePicture", doctor.getProfilePicture());
     }
-        User user = new User(doctor.getUserId(), doctor.getName(), doctor.getPassword(), doctor.getContact(), doctor.getRole());
+        User user = new User(doctor.getUserId(), doctor.getName(), doctor.getPassword(), doctor.getContact(), doctor.getRole(), doctor.getEmail());
         return userRepository.update(user);
     }
 
@@ -125,9 +127,7 @@ public class DoctorRepository implements SHSRDAO<Doctor> {
             //delete patient
             ApiFuture<WriteResult> writeResult = dbFirestore.collection(COL_NAME).document(doctorId).delete();
             timeDeleteUser = userRepository.delete(doctorId);
-        
-
+    
         return "Document with Doctor Id " + doctorId + " has been deleted. " + timeDeleteUser;
     }
-
 }

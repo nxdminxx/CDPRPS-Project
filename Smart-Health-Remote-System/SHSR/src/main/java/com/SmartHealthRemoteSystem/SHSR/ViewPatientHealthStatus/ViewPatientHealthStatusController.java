@@ -33,15 +33,14 @@ public class ViewPatientHealthStatusController {
     private final PatientService patientService;
     private final DoctorService doctorService;
 
-    
-
     @Autowired
     public ViewPatientHealthStatusController( HealthStatusService healthStatusService,DoctorService doctorService, PatientService patientService) {
         this.doctorService = doctorService;
         this.patientService = patientService;
         this.healthStatusService = healthStatusService;
     }
-@PostMapping("/a")
+
+    @PostMapping("/a")
     public String getHealthStatus(@RequestParam("patientId")String patientId,
                                   @RequestParam("doctorId")String doctorId, Model model) throws ExecutionException, InterruptedException {
         //Retrieve information
@@ -64,7 +63,6 @@ public class ViewPatientHealthStatusController {
 
         return "viewPatientHealthStatus" ;
 
-
     } 
 
     @GetMapping("/b")
@@ -76,10 +74,10 @@ public class ViewPatientHealthStatusController {
 
         //Retrive patient list of health status
         List<HealthStatus> healthStatus= healthStatusService.getListHealthStatus(patientId);
-//        List<HealthStatus> threeLastHealth=null;
-//    for (int i = healthStatus.size()-1; i==(healthStatus.size()-3) ; i--) {
-//        threeLastHealth.add(healthStatus.get(i));
-//    }
+        //        List<HealthStatus> threeLastHealth=null;
+        //    for (int i = healthStatus.size()-1; i==(healthStatus.size()-3) ; i--) {
+        //        threeLastHealth.add(healthStatus.get(i));
+        //    }
 
         //paging start
         int pageSize = 5;
@@ -115,7 +113,6 @@ public class ViewPatientHealthStatusController {
 
         return "viewDailyHealthSymptom" ;
     }
-    
 
     @PostMapping("/deletesymptom")
     public String deletesymptom(@RequestParam("patientId")String patientId,
@@ -134,10 +131,8 @@ public class ViewPatientHealthStatusController {
         model.addAttribute("healthStatusList",healthStatus);
 
         return "redirect:/viewPatientHealthStatus/b?patientId=" + patientId + "&doctorId=" + doctorId;
-
-
     } 
-    }
+}
 
     
 
