@@ -81,7 +81,7 @@ public class PatientController {
         model.addAttribute("doctor", doctor);
         model.addAttribute("patientList", patientList);
   
-        return "test";
+        return "editProfile";
     }
 
     @PostMapping("/editProfile/submit")
@@ -101,7 +101,7 @@ public class PatientController {
         model.addAttribute("errorMsg", Message); */
        
 
-        return "test";
+        return "editProfile";
 
         /* Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
