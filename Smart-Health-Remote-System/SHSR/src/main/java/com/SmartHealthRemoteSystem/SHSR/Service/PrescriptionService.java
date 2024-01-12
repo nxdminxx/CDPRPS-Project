@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class PrescriptionService {
+    
     private final SubCollectionSHSRDAO<Prescription> prescriptionRepository;
     // private final SHSRDAO<Prescription> prescriptionRepository;
 

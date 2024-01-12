@@ -7,6 +7,7 @@ import java.sql.Time;
 
 
 public class HealthStatus {
+    
     //add health status Id to prevent conflict in database
     private String healthStatusId;
     private String additionalNotes;
