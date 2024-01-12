@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserService {
+    
     private final SHSRDAO<User> userRepository;
 
     public UserService(SHSRDAO<User> userRepository) {

@@ -31,13 +31,11 @@ public class HealthStatusService {
         return healthStatusRepository.get(healthStatusId, patientId);
     }
 
-
     public void updateHealthStatus(HealthStatus healthStatus, String patientId) throws ExecutionException, InterruptedException {
         String timeUpdated = healthStatusRepository.update(healthStatus, patientId);
     }
 
     public String deleteHealthStatus(String healthStatusId, String patientId) throws ExecutionException, InterruptedException {
             return healthStatusRepository.delete(healthStatusId, patientId);
-    }   
-
+    }     
 }

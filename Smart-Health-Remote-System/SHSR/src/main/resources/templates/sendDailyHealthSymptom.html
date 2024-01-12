@@ -29,7 +29,7 @@
             <div class="col ">
                 <div class="d-flex shadow flex-column flex-shrink-0 p-3 bg-primary bg-opacity-25 rounded">
                     <div class="card bg-primary bg-opacity-25 rounded">
-                        <img class="card-img-top" src="/static/image/img_avatar1.png" alt="Card image" >
+                        <img class="card-img-top" src="/image/img_avatar1.png" alt="Card image" >
                         <div class="card-body">
                             <h3 class="card-title" th:text="${patient.name}"></h3>
                             <p style=" font-size: 12px;">Patient Contact No. : <span th:text="${patient.contact}"></span></p>
@@ -83,6 +83,7 @@
 <!--                                <a href="javascript: document.healthStatusForm.submit()"  class="list-group-item m-3 d-flex justify-content-center align-items-center bg-primary bg-opacity-50 rounded" style=" height: 75px;">-->
 <!--                                    <h3>Send Health Symptoms to Doctor</h3>-->
 <!--                                </a>-->
+
                                 <h1 >Share your today's symptom!</h1>
 
                                 <form th:action="@{/Health-status/sendHealthStatus}"   method="post">
@@ -94,9 +95,9 @@
 
                                     <div list-group-item class="m-3 d-flex justify-content-center align-items-center" >
                                         <input class="btn btn-primary confirmBtn " value="Send symptom" type="submit">
-
                                     </div>
                                 </form>
+                                
                                 <form th:action="@{/patient/backDashboard}"   method="post">
                                     <div>
                                         <input type="hidden" th:value="${patient.userId}" th:name="patientId">
