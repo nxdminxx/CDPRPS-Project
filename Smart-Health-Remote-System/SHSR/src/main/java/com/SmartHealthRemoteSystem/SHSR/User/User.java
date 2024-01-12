@@ -10,23 +10,26 @@ public class User {
     private String password;
     private String contact;
     private String role;
+    private String email;
 
     public User() {
     }
 
-    public User(String userId, String name, String password, String contact, String role) {
+    public User(String userId, String name, String password, String contact, String role, String email) {
         this.userId = userId;
         this.name = name;
         this.password = password;
         this.contact = contact;
         this.role = role;
+        this.email = email;
     }
 
-    public User(String name, String password, String contact, String role) {
+    public User(String name, String password, String contact, String role, String email) {
         this.name = name;
         this.password = password;
         this.contact = contact;
         this.role = role;
+        this.email = email;
     }
 
     public String getRole() {
@@ -69,4 +72,11 @@ public class User {
         this.contact = contact;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

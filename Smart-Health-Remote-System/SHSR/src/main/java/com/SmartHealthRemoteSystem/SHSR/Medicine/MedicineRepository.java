@@ -57,7 +57,6 @@ public class MedicineRepository implements SHSRDAO<Medicine> {
             medicine = document.toObject(Medicine.class);
             medicineList.add(medicine);
         }
-
         return medicineList;
     }
 
@@ -69,6 +68,7 @@ public class MedicineRepository implements SHSRDAO<Medicine> {
         medicine.setMedId(addedDocRef.getId());
         ApiFuture<WriteResult> collectionsApiFuture =
                 addedDocRef.set(medicine);
+
         /* ApiFuture<WriteResult> writeResult = addedDocRef.update("timestamp", collectionsApiFuture.get().getUpdateTime()); */
 
         return addedDocRef.getId();
@@ -78,23 +78,23 @@ public class MedicineRepository implements SHSRDAO<Medicine> {
     public String update(Medicine medicine) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         DocumentReference addedDocRef = dbFirestore.collection(COL_NAME).document(medicine.getMedId());
-        ApiFuture<WriteResult> collectionsApiFuture = null;
-        if(!(medicine.getMedName().isEmpty())){
-            collectionsApiFuture =addedDocRef.update("MedName", medicine.getMedName());
+    
+        // Create a list to hold update tasks
+        List<ApiFuture<WriteResult>> updateTasks = new ArrayList<>();
+    
+        // Update medName only if it is not empty
+        if (!(medicine.getMedName().isEmpty())) {
+            updateTasks.add(addedDocRef.update("medName", medicine.getMedName()));
         }
-        /* if (!(sensorData.getOxygenReading().isEmpty())){
-            collectionsApiFuture =  addedDocRef.update("oxygenReading", sensorData.getOxygenReading());
+    
+        // Update Quantity
+        updateTasks.add(addedDocRef.update("quantity", medicine.getQuantity()));
+    
+        // Wait for all update tasks to complete
+        for (ApiFuture<WriteResult> task : updateTasks) {
+            task.get(); // This will block and wait for each update to complete
         }
-        if (sensorData.getBodyTemperature() != null){
-            collectionsApiFuture = addedDocRef.update("bodyTemperature", sensorData.getBodyTemperature());
-        }
-        if (sensorData.getHeart_Rate() != 0){
-            collectionsApiFuture = addedDocRef.update("Heart_Rate", sensorData.getHeart_Rate());
-        }//mg, ijat, keng, faruq, din
-        if (collectionsApiFuture != null) {
-            ApiFuture<WriteResult> writeResult = addedDocRef.update("timestamp", collectionsApiFuture.get().getUpdateTime());
-            return writeResult.get().getUpdateTime().toString();
-        } */
+    
         return Timestamp.now().toString();
     }
 

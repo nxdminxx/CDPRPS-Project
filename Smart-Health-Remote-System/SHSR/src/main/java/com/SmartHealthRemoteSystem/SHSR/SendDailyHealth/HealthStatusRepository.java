@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-// faruq
 // import org.springframework.data.jpa.repository.JpaRepository;
 // import org.springframework.data.jpa.repository.Query;
 
@@ -33,7 +32,6 @@ public class HealthStatusRepository implements SubCollectionSHSRDAO<HealthStatus
         this.sensorDataRepository = sensorDataRepository;
     }
 
-    // faruq
     // @Query("SELECT h FROM HealthStatus h WHERE " + "CONCAT(h.timestamp, h.additionalNotes)" + "LIKE %?1%")
     // public List<HealthStatus> search(String keyword) throws ExecutionException, InterruptedException;
 

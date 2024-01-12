@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class DoctorService {
-
     private final SHSRDAO<Doctor> doctorRepository;
     private final SHSRDAO<Patient> patientRepository;
     private final SHSRDAO<User> userRepository;
@@ -29,7 +28,7 @@ public class DoctorService {
     public String createDoctor(Doctor doctor) throws ExecutionException, InterruptedException {
         boolean checkUserExist = false;
         //create a temporary user
-        User user = new User(doctor.getUserId(), doctor.getName(), doctor.getPassword(), doctor.getContact(), doctor.getRole());
+        User user = new User(doctor.getUserId(), doctor.getName(), doctor.getPassword(), doctor.getContact(), doctor.getRole(), doctor.getEmail());
 
         //get list of all user
         List<User> userList = userRepository.getAll();
@@ -54,6 +53,7 @@ public class DoctorService {
     }
   
     public Doctor getDoctor(String doctorId) throws ExecutionException, InterruptedException {
+        
         if(doctorId.isEmpty()){
             return new Doctor();
         }
@@ -67,6 +67,7 @@ public class DoctorService {
             doctor.setContact(user.getContact());
             doctor.setRole(user.getRole());
             doctor.setUserId(user.getUserId());
+            doctor.setEmail(user.getEmail());
             return doctor;
         }
     }
@@ -74,6 +75,7 @@ public class DoctorService {
     public List<Doctor> getListDoctor() throws ExecutionException, InterruptedException {
         return doctorRepository.getAll();
     }
+
 
     public String deleteDoctor(String doctorId) throws ExecutionException, InterruptedException {
         return doctorRepository.delete(doctorId);

@@ -52,41 +52,44 @@ public class PatientRepository implements SHSRDAO<Patient> {
             tempPatient.setPassword(user.getPassword());
             tempPatient.setContact(user.getContact());
             tempPatient.setRole(user.getRole());
+            tempPatient.setEmail(user.getEmail());
             return tempPatient;
         } else {
             return null;
         }
     }
 
-    @Override 
-    public List<Patient> getAll() throws ExecutionException, InterruptedException { 
-        Firestore dbFirestore = FirestoreClient.getFirestore(); 
-        Iterable<DocumentReference> documentReference = dbFirestore.collection(COL_NAME).listDocuments(); 
-        Iterator<DocumentReference> iterator = documentReference.iterator(); 
- 
-        List<Patient> patientList = new ArrayList<>(); 
-        Patient patient; 
-        while (iterator.hasNext()) { 
-            DocumentReference documentReference1 = iterator.next(); 
-            ApiFuture<DocumentSnapshot> future = documentReference1.get(); 
-            DocumentSnapshot document = future.get(); 
-            patient = document.toObject(Patient.class); 
- 
-            // Check if user is null before further processing 
-            if (patient != null) { 
-                User user = userRepository.get(document.getId()); 
-                if (user != null) { 
-                    patient.setUserId(user.getUserId()); 
-                    patient.setPassword(user.getPassword()); 
-                    patient.setName(user.getName()); 
-                    patient.setContact(user.getContact()); 
-                    patient.setRole(user.getRole()); 
-                    patientList.add(patient); 
-                } 
-            } 
-        } 
- 
-        return patientList; 
+    @Override
+    public List<Patient> getAll() throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        Iterable<DocumentReference> documentReference = dbFirestore.collection(COL_NAME).listDocuments();
+        Iterator<DocumentReference> iterator = documentReference.iterator();
+
+        List<Patient> patientList = new ArrayList<>();
+        Patient patient;
+        
+        while (iterator.hasNext()) {
+            DocumentReference documentReference1 = iterator.next();
+            ApiFuture<DocumentSnapshot> future = documentReference1.get();
+            DocumentSnapshot document = future.get();
+            patient = document.toObject(Patient.class);
+
+            // Check if user is null before further processing
+            if (patient != null) {
+                User user = userRepository.get(document.getId());
+                if (user != null) {
+                    patient.setUserId(user.getUserId());
+                    patient.setPassword(user.getPassword());
+                    patient.setName(user.getName());
+                    patient.setContact(user.getContact());
+                    patient.setRole(user.getRole());
+                    patient.setEmail(user.getEmail());
+                    patientList.add(patient);
+                }
+            }
+        }
+
+        return patientList;
     }
 
     @Override
@@ -101,7 +104,7 @@ public class PatientRepository implements SHSRDAO<Patient> {
 
 
         //Create a temporary User
-        User user = new User(patient.getUserId(), patient.getName(), patient.getPassword(), patient.getContact(), patient.getRole());
+        User user = new User(patient.getUserId(), patient.getName(), patient.getPassword(), patient.getContact(), patient.getRole(), patient.getEmail());
         userRepository.save(user);
 
         ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_NAME).document(patient.getUserId()).set(tempPatient);
@@ -157,7 +160,7 @@ public class PatientRepository implements SHSRDAO<Patient> {
             dbFirestore.collection(COL_NAME).document(patient.getUserId()).update("contact", patient.getContact());
         }
 
-        User user = new User(patient.getUserId(), patient.getName(), patient.getPassword(), patient.getContact(), patient.getRole());
+        User user = new User(patient.getUserId(), patient.getName(), patient.getPassword(), patient.getContact(), patient.getRole(), patient.getEmail());
         return userRepository.update(user);
     } 
  

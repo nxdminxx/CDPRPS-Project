@@ -56,15 +56,19 @@ public class UserRepository implements SHSRDAO<User> {
     public String update(User user) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> collectionsApiFuture = null;
-        //if-else condition is added to check which field does the user update.
-        //statement inside if-else condition will add change value into a map key value
-        //map key value will be pass to firestore database to be updated.
+        //if-else condition to check which field does the user update.
+        //statement if-else condition add change value into a map key value
+        //map key value pass to firestore database to be update
         if(!(user.getName().isEmpty())){
             collectionsApiFuture = dbFirestore.collection(COL_NAME).document(user.getUserId()).update("name", user.getName());
         }
-    
+        
         if(!(user.getContact().isEmpty())){
             collectionsApiFuture = dbFirestore.collection(COL_NAME).document(user.getUserId()).update("contact", user.getContact());
+        }
+
+        if(!(user.getEmail().isEmpty())){
+            collectionsApiFuture = dbFirestore.collection(COL_NAME).document(user.getUserId()).update("email", user.getEmail());
         }
 
         if (collectionsApiFuture != null) {
@@ -74,38 +78,57 @@ public class UserRepository implements SHSRDAO<User> {
         }
     }
 
-    @Override
     public String delete(String id) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_NAME).document(id).delete();
-        return collectionsApiFuture.get().getUpdateTime().toString();
+        Map<String, ApiFuture<WriteResult>> deleteFutures = new HashMap<>();
+    
+        // Delete from User collection
+        DocumentReference userDocumentReference = dbFirestore.collection(COL_NAME).document(id);
+        deleteFutures.put("User", userDocumentReference.delete());
+    
+        Map<String, String> roleCollections = new HashMap<>();
+        roleCollections.put("DOCTOR", "Doctor");
+        roleCollections.put("PATIENT", "Patient");
+        roleCollections.put("PHARMACIST", "Pharmacist");
+    
+        // Delete role from collection
+        String userRole = getUserRole(id); //method to get the user role
+        if (roleCollections.containsKey(userRole)) {
+            String roleCollectionName = roleCollections.get(userRole);
+            DocumentReference roleDocumentReference = dbFirestore.collection(roleCollectionName).document(id);
+            deleteFutures.put(userRole, roleDocumentReference.delete());
+        }
+    
+        //deletion process
+        for (Map.Entry<String, ApiFuture<WriteResult>> entry : deleteFutures.entrySet()) {
+            String collectionName = entry.getKey();
+            ApiFuture<WriteResult> deleteFuture = entry.getValue();
+    
+            try {
+                deleteFuture.get();
+                System.out.println("Deleted from collection: " + collectionName);
+                
+            } catch (Exception e) {
+                System.err.println("Error deleting from collection " + collectionName + ": " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    
+        return Timestamp.now().toString();
     }
-
-    /* @Override
-    public String updatePat(User user) throws ExecutionException, InterruptedException {
+    
+    private String getUserRole(String userId) throws ExecutionException, InterruptedException {
+        //logic to get the user role from user id
+        // Return the user role as a string
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference docRef = dbFirestore.collection(COL_NAME).document(user.getUserId());
-
-        Map<String, Object> updates = new HashMap<>();
-        if (!user.getName().isEmpty()) {
-            updates.put("name", user.getName());
-        }
-        if (!user.getPassword().isEmpty()) {
-            updates.put("password", user.getPassword());
-        }
-        if (!user.getContact().isEmpty()) {
-            updates.put("contact", user.getContact());
-        }
-        if (!user.getRole().isEmpty()) {
-            updates.put("role", user.getRole());
-        }
-
-        if (!updates.isEmpty()) {
-            ApiFuture<WriteResult> collectionsApiFuture = docRef.update(updates);
-            return collectionsApiFuture.get().getUpdateTime().toString();
+        DocumentReference userDocumentReference = dbFirestore.collection(COL_NAME).document(userId);
+        ApiFuture<DocumentSnapshot> future = userDocumentReference.get();
+        DocumentSnapshot document = future.get();
+        if (document.exists()) {
+            User user = document.toObject(User.class);
+            return user.getRole();
         } else {
-            return Timestamp.now().toString();
+            return null;
         }
-    } */
-
+    }
 }
