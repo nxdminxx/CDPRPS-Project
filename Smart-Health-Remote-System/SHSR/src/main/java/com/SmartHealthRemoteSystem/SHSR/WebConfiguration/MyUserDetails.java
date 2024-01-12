@@ -16,8 +16,9 @@ import java.util.stream.Collectors;
 public class MyUserDetails implements UserDetails {
     private User user;
     private List<GrantedAuthority> authorities;
-    @Autowired
-    private DoctorRepository doctorRepository;
+
+    // @Autowired
+    // private DoctorRepository doctorRepository;
 
     public MyUserDetails(User user){
         this.user = user;

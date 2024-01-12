@@ -16,10 +16,12 @@ import java.util.concurrent.ExecutionException;
 @Controller
 @RequestMapping("/Health-status")
 public class SendHealthStatusController {
+    
     private final HealthStatusService healthStatusService;
     private final PatientService patientService;
     private final SensorDataService sensorDataService;
     private final DoctorService doctorService;
+    
     public SendHealthStatusController(HealthStatusService healthStatusService, PatientService patientService, SensorDataService sensorDataService, DoctorService doctorService) {
         this.healthStatusService = healthStatusService;
         this.patientService=patientService;
@@ -32,7 +34,6 @@ public class SendHealthStatusController {
                                    @RequestParam(value="patientId") String patientId,
                                    @RequestParam (value = "doctorId")String doctorId,
                                    Model model) throws ExecutionException, InterruptedException {
-
 
         String sensorId=patientService.getPatientSensorId(patientId);
         //symptom+="\n"+ sensorDataService.stringSensorData(sensorId);
@@ -56,6 +57,7 @@ public class SendHealthStatusController {
         model.addAttribute("patient", patient);
         model.addAttribute("doctor", doctor);
 
+        //healthstatus service utk retrieve symptom
         return "sendDailyHealthSymptom";
     }
 }

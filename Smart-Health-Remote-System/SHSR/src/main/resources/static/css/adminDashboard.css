@@ -197,3 +197,17 @@
 .radioBtn_hide{
     display: none;
 }
+
+.update-timestamp {
+    font-size: 14px;
+    color: #000000; 
+    margin-top: 10px;
+    font-size: 10;
+}
+
+.btn-message {
+    font-weight: bold;
+    color: rgb(53, 191, 255); 
+    font-size: 10;
+}
+

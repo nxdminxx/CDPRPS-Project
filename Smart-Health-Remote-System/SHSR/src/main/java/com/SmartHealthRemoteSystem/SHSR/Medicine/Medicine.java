@@ -1,49 +1,59 @@
 package com.SmartHealthRemoteSystem.SHSR.Medicine;
 
 public class Medicine {
-    private String MedName;
-    private String MedId;
-    private int Quantity;
 
-    public Medicine(){
+    private String medName;
+    private String medId;
+    private int quantity;
+    private String patientId;
+
+    public Medicine() {
     }
 
-    public Medicine(String MedName){
-        this.MedName = MedName;
+    public Medicine(String medName) {
+        this.medName = medName;
     }
 
-    public Medicine(String MedName, int Quantity){
-        this.MedName = MedName;
-        this.Quantity = Quantity;
+    public Medicine(String medName, int quantity) {
+        this.medName = medName;
+        this.quantity = quantity;
     }
 
-    public Medicine(String MedName, String MedId, int Quantity){
-        this.MedName = MedName;
-        this.MedId = MedId;
-        this.Quantity = Quantity;
+    public Medicine(String medName, String medId, int quantity) {
+        this.medName = medName;
+        this.medId = medId;
+        this.quantity = quantity;
     }
 
-    public void setMedName(String MedName){
-        this.MedName = MedName;
+    public void setMedName(String medName) {
+        this.medName = medName;
     }
 
-    public String getMedName(){
-        return MedName;
+    public String getMedName() {
+        return medName;
     }
 
-    public void setMedId(String MedId){
-        this.MedId = MedId;
+    public void setMedId(String medId) {
+        this.medId = medId;
     }
 
-    public String getMedId(){
-        return MedId;
+    public String getMedId() {
+        return medId;
     }
 
-    public void setQuantity(int Quantity){
-        this.Quantity = Quantity;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
-    public int getQuantity(){
-        return Quantity;
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getPatientId() {
+        return patientId;
     }
 }
