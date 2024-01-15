@@ -3,7 +3,7 @@ package com.SmartHealthRemoteSystem.SHSR.User.admin;
 import com.SmartHealthRemoteSystem.SHSR.User.Doctor.Doctor;
 import com.SmartHealthRemoteSystem.SHSR.User.Patient.Patient;
 import com.SmartHealthRemoteSystem.SHSR.User.Pharmacist.Pharmacist;
-import com.SmartHealthRemoteSystem.Mail.MailStructure;
+import com.SmartHealthRemoteSystem.SHSR.Mail.MailStructure;
 import com.SmartHealthRemoteSystem.SHSR.Pagination.PaginationInfo;
 import com.SmartHealthRemoteSystem.SHSR.Service.DoctorService;
 import com.SmartHealthRemoteSystem.SHSR.Service.MailService;

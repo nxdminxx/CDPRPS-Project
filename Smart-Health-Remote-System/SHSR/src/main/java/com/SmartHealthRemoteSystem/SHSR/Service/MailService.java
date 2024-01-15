@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.SmartHealthRemoteSystem.Mail.MailStructure;
+import com.SmartHealthRemoteSystem.SHSR.Mail.MailStructure;
 import com.SmartHealthRemoteSystem.SHSR.User.UserRepository;
 
 import org.springframework.mail.MailException;
