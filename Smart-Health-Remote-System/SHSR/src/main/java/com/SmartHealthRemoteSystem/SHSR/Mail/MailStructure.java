@@ -1,4 +1,4 @@
-package com.SmartHealthRemoteSystem.Mail;
+package com.SmartHealthRemoteSystem.SHSR.Mail;
 
 public class MailStructure {
     private String to;
