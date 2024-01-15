@@ -102,22 +102,73 @@ public class DoctorController {
         return "myPatient";
     }
 
-
     @GetMapping("/sensorDashboard")
     public String getSensorDashboard(Model model, @RequestParam(value= "patientId") String patientId) throws Exception {
-        Patient patient = doctorService.getPatient(patientId);
-        SensorDataService sensorDataService = new SensorDataService();
-        model.addAttribute("patientid",patientId);
+        Firestore firestore = FirestoreClient.getFirestore();
+          Patient patient = doctorService.getPatient(patientId);
+          SensorDataService sensorDataService = new SensorDataService();
+          SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
         
-    //--------------IZZAT-----------------------------------------
-    //if there is no sensor id, will not call sensor data class
-        if(patient.getSensorDataId().isEmpty()){
-            return "sensorDashboard";  
+          Query query = firestore.collection("SensorData")
+          .document(patient.getSensorDataId())
+          .collection("SensorDataHistory").orderBy("#", Direction.DESCENDING).limit(1);
+          ApiFuture<QuerySnapshot> querySnapshot = query.get();
+          List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+        
+          int highestDocumentNumber = 0;
+          if (!documents.isEmpty()) {
+            highestDocumentNumber = documents.get(0).getLong("#").intValue();
           }
-        SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
-        model.addAttribute("sensorDataList",sensorData);
-        return "sensorDashboard";
-    }
+          
+          // Create a new document with the next document number
+          DocumentReference docRef = firestore.collection("SensorData")
+          .document(patient.getSensorDataId())
+          .collection("SensorDataHistory")
+          .document("sensordata" + String.format("%03d", highestDocumentNumber + 1));
+  
+    // Populate the document with the sensor data fields
+          Map<String, Object> data = new HashMap<>();
+          data.put("#", highestDocumentNumber +1 );
+          data.put("Heart_Rate", sensorData.getHeart_Rate());
+          data.put("bodyTemperature", sensorData.getBodyTemperature());
+          data.put("ecgReading", sensorData.getEcgReading());
+          data.put("oxygenReading", sensorData.getOxygenReading());
+          data.put("sensorDataId", sensorData.getSensorDataId());
+          data.put("timestamp", sensorData.getTimestamp());
+  
+          model.addAttribute("sensorDataList",sensorData);
+          model.addAttribute("patientid",patientId);
+  
+          // Write the data to the document
+          docRef.set(data);
+
+         
+       
+        Iterable<DocumentReference> documentReference = firestore.collection("SensorData")
+        .document(patient.getSensorDataId())
+        .collection("SensorDataHistory").listDocuments();
+        Iterator<DocumentReference> iterator = documentReference.iterator();
+
+        List<SensorData> sensorDataList = new ArrayList<>();
+        SensorData sensorDatahistory;
+        while (iterator.hasNext()) {
+            DocumentReference documentReference1=iterator.next();
+            ApiFuture<DocumentSnapshot> future = documentReference1.get();
+            DocumentSnapshot document = future.get();
+            sensorData = document.toObject(SensorData.class);
+            sensorDataList.add(sensorData);
+            model.addAttribute("sensorDataListHistory",sensorDataList);
+            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println(sensorDataList);
+            System.out.println("-------------------------------------------------------------------------------");
+
+        }
+
+        model.addAttribute("success","success");
+       
+          return "sensorDashboard";
+      }
+
 
     @PostMapping("/create")
     public String saveSensorData(Model model, @RequestParam(value= "sensordata") String sensordata,

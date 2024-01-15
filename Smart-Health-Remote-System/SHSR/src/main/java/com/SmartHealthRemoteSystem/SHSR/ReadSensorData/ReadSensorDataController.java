@@ -82,6 +82,8 @@ public class ReadSensorDataController {
         return "sensorDashboard";
     }
        
+    
+      
     @GetMapping("/get-sensor-data/{sensorDataId}")
     public SensorData getHealthStatus(@PathVariable String sensorDataId) throws ExecutionException, InterruptedException {
 
@@ -94,7 +96,7 @@ public class ReadSensorDataController {
             //display error message
         }
     }
-
+//trying
     @PutMapping("/update-sensor-data")
     public void updateSensorData(@RequestBody SensorData sensorData) throws ExecutionException, InterruptedException {
         String timeUpdated = sensorDataService.updateSensorData(sensorData);
