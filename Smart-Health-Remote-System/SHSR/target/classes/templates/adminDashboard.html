@@ -51,58 +51,94 @@
                 </div>
                 <hr class="admin_line">
 
-                 <!--patient table-->
-                 <div class="user_table tableActive">
-                    <table class="table table table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">No</th>
-                            <th scope="col">User Id</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Contact No</th>
-                            <th scope="col">Email</th>
-                            
-                            <th scope="col">Role</th>
-                            <th scope="col">Emergency contact</th>
-                            <th scope="col">Address</th>
-                            <th scope="col">Sensor Id</th>
-                            <th scope="col">Action</th>
+<!--IZZATI CODE-->
 
-                        </tr>
-                        </thead>
-                        <tbody id="patientTable">
-                        <!--javascript retrieving all the data from database-->
-                        <tr th:each="patient : ${patientList}">
-                            <th scope="row" th:text="${patientStat.index}+1"></th>
-                            <td th:text="${patient.userId}"></td>
-                            <td th:text="${patient.name}"></td>
-                            <td th:text="${patient.contact}"></td>
-                            <td th:text="${patient.email}"></td>
-                            
-                            <td th:text="${patient.role}"></td>
-                            <td th:text="${patient.emergencyContact}"></td>
-                            <td th:text="${patient.address}"></td>
-                            <td th:text="${patient.sensorDataId}"></td>
+<!--patient table-->
+<div class="user_table tableActive">
+    <!-- search bar patient -->
+    <div style="padding-left: 10;">
+        <input type="text" placeholder="Enter keyword to search" id="search-input-patient" style="width: 50%; padding-left: 10px;" class="search-input">
+    </div>
+    <!-- search bar patient -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">No</th>
+                <th scope="col">User Id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Contact No</th>
+                <th scope="col">Role</th>
+                <th scope="col">Emergency contact</th>
+                <th scope="col">Address</th>
+                <th scope="col">Sensor Id</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody id="patientTable" class="patientTable">
+            <!--javascript retrieving all the data from database-->
+            <script th:inline="javascript">
+    /*<![CDATA[*/
+    var patientList = /*[[${patientList}]]*/ [];
+    /*]]>*/
+</script>
+            <tr th:each="patient, stat: ${patientList}">
+                <th scope="row" th:text="${stat.index + 1 + (patientPagination.totalPage * (patientPagination.currentPage - 1))}"></th>
+                <td th:text="${patient.userId}" data-column="userId"></td>
+                <td th:text="${patient.name}" data-column="name"></td>
+                <td th:text="${patient.contact}" data-column="contact"></td>
+                <td th:text="${patient.role}" data-column="role"></td>
+                <td th:text="${patient.emergencyContact}" data-column="emergencyContact"></td>
+                <td th:text="${patient.address}" data-column="address"></td>
+                <td th:text="${patient.sensorDataId}" data-column="sensorDataId"></td>
+                <td>
+                    <button type="button" class="btn btn-warning editUserBtn editPatient">Edit</button>
+                    <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- paging button start -->
+    <!-- Pagination for Patient List -->
+    <div class="d-flex justify-content-center align-items-center">
+        <nav aria-label="Patient Pagination" th:if="${patientPagination.totalPage > 1}">
+            <ul class="pagination">
+                <li class="page-item" th:class="${patientPagination.prevPage < 1 ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/admin?pageNo=1}">&lt;</a>
+                </li>
+                <li th:each="i: ${#numbers.sequence(1, patientPagination.totalPage)}" class="page-item">
+                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${i}__}" th:text="${i}"></a>
+                </li>
+                <li class="page-item" th:class="${patientPagination.nextPage > patientPagination.totalPage} ? 'disabled'">
+                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${patientPagination.totalPage}__}">&gt;</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 
-                            <td>
-                                <button type="button" class="btn btn-warning editUserBtn editPatient" >Edit</button>
-                                <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+    <div class="d-flex justify-content-center align-items-center bg-primary bg-opacity-25 shadow-lg rounded">
+        <p class="btn"><b>Page: <span th:text="${patientPagination.currentPage}"></span></b></p>
+    </div>
+    <!-- paging button end -->
+</div>
+
+<!-- Your existing HTML code -->
+
+<!--IZZATI CODE-->
                 </div>
-
-                 <!--doctor table-->
-                 <div class="user_table">
-                    <table class="table table table-striped">
+                <!--doctor table-->
+                <div class="user_table">
+                    <!-- search bar doctor -->
+                    <div style="padding-left: 10;">
+                        <input type="text" placeholder="Enter keyword to search" id="search-input-doctor" style="width: 50%; padding-left: 10px;" class="search-input">
+                    </div>
+                    <!-- search bar doctor -->
+                    <table class="table table-striped">
                         <thead>
                         <tr>
                             <th scope="col">No</th>
                             <th scope="col">User Id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Contact No</th>
-                            <th scope="col">Email</th>
                            
                             <th scope="col">Role</th>
                             <th scope="col">Hospital</th>
@@ -110,18 +146,17 @@
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
-                        <tbody id="doctorTable">
+                        <tbody id="doctorTable" class="doctorTable">
                         <!--javascript retrieving all the data from database-->
-                        <tr th:each="doctor : ${doctorList}">
-                            <th scope="row" th:text="${doctorStat.index}+1"></th>
-                            <td th:text="${doctor.userId}"></td>
-                            <td th:text="${doctor.name}"></td>
-                            <td th:text="${doctor.contact}"></td>
-                            <td th:text="${doctor.email}"></td>
+                        <tr th:each="doctor, stat: ${doctorPagination.dataToDisplay}">
+                            <th scope="row" th:text="${stat.index + 1 + (doctorPagination.totalPage * (doctorPagination.currentPage - 1))}"></th>
+                            <td th:text="${doctor.userId}" data-column="userId"></td>
+                            <td th:text="${doctor.name}" data-column="name"></td>
+                            <td th:text="${doctor.contact}" data-column="contact"></td>
                            
-                            <td th:text="${doctor.role}"></td>
-                            <td th:text="${doctor.hospital}"></td>
-                            <td th:text="${doctor.position}"></td>
+                            <td th:text="${doctor.role}" data-column="role"></td>
+                            <td th:text="${doctor.hospital}" data-column="hospital"></td>
+                            <td th:text="${doctor.position}" data-column="position"></td>
                             <td>
                                 <button type="button" class="btn btn-warning editUserBtn editDoctor">Edit</button>
                                 <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
@@ -129,10 +164,39 @@
                         </tr>
                         </tbody>
                     </table>
+                    <!--IZZATI CODE-->
+                    <!-- paging button start -->
+                    <!-- Pagination for Doctor List -->
+                    <div class="d-flex justify-content-center align-items-center">
+                        <nav aria-label="Doctor Pagination" th:if="${doctorPagination.totalPage > 1}">
+                            <ul class="pagination">
+                                <li class="page-item" th:class="${doctorPagination.prevPage < 1 ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin?pageNo=1}">&lt;</a>
+                                </li>
+                                <li th:each="i: ${#numbers.sequence(1, doctorPagination.totalPage)}" class="page-item">
+                                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${i}__}"  th:text="${i}"></a>
+                                </li>
+                                <li class="page-item" th:class="${doctorPagination.nextPage > doctorPagination.totalPage} ? 'disabled'">
+                                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${doctorPagination.totalPage}__}">&gt;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div class="d-flex justify-content-center align-items-center bg-primary bg-opacity-25 shadow-lg rounded">
+                        <p class="btn"><b>Page: <span th:text="${doctorPagination.currentPage}"></span></b></p>
+                    </div>
+
+                    <!-- paging button end -->
                 </div>
 
                  <!--pharmacist table-->
                  <div class="user_table">
+                    <!-- search bar pharmacsit -->
+                    <div style="padding-left: 10;">
+                        <input type="text" placeholder="Enter keyword to search" id="search-input-pharmacist" style="width: 50%; padding-left: 10px;" class="search-input">
+                    </div>
+                    <!-- search bar pharmacist -->
                     <table class="table table table-striped">
                         <thead>
                         <tr>
@@ -148,18 +212,18 @@
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
-                        <tbody id="pharmacistTable">
+                        <tbody id="pharmacistTable" class="pharmacistTable">
                         <!--javascript retrieving all the data from database-->
-                        <tr th:each="pharmacist : ${pharmacistList}">
-                            <th scope="row" th:text="${pharmacistStat.index}+1"></th>
-                            <td th:text="${pharmacist.userId}"></td>
-                            <td th:text="${pharmacist.name}"></td>
-                            <td th:text="${pharmacist.contact}"></td>
-                            <td th:text="${pharmacist.email}"></td>
+                        <tr th:each="pharmacist, stat: ${pharmacistPagination.dataToDisplay}">
+                            <th scope="row" th:text="${stat.index + 1 + (pharmacistPagination.totalPage * (pharmacistPagination.currentPage - 1))}"></th>
+                            <td th:text="${pharmacist.userId}" data-column="userId"></td>
+                            <td th:text="${pharmacist.name}" data-column="name"></td>
+                            <td th:text="${pharmacist.contact}" data-column="contact"></td>
+                            <td th:text="${pharmacist.email}" data-column="email"></td>
 
-                            <td th:text="${pharmacist.role}"></td>
-                            <td th:text="${pharmacist.hospital}"></td>
-                            <td th:text="${pharmacist.position}"></td>
+                            <td th:text="${pharmacist.role}" data-column="role"></td>
+                            <td th:text="${pharmacist.hospital}" data-column="hospital"></td>
+                            <td th:text="${pharmacist.position}" data-column="position"></td>
                             <td>
                                 <button type="button" class="btn btn-warning editUserBtn editPharmacist">Edit</button>
                                 <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
@@ -167,10 +231,38 @@
                         </tr>
                         </tbody>
                     </table>
+                    <!-- paging button start -->
+                    <!-- Pagination for Pharmacist List -->
+                    <div class="d-flex justify-content-center align-items-center">
+                        <nav aria-label="Pharmacist Pagination" th:if="${pharmacistPagination.totalPage > 1}">
+                            <ul class="pagination">
+                                <li class="page-item" th:class="${pharmacistPagination.prevPage < 1 ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin?pageNo=1}">&lt;</a>
+                                </li>
+                                <li th:each="i: ${#numbers.sequence(1, pharmacistPagination.totalPage)}" class="page-item">
+                                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${i}__}" th:text="${i}"></a>
+                                </li>
+                                <li class="page-item" th:class="${pharmacistPagination.nextPage > pharmacistPagination.totalPage} ? 'disabled'">
+                                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${pharmacistPagination.totalPage}__}">&gt;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div class="d-flex justify-content-center align-items-center bg-primary bg-opacity-25 shadow-lg rounded">
+                        <p class="btn"><b>Page: <span th:text="${pharmacistPagination.currentPage}"></span></b></p>
+                    </div>
+                    <!-- paging button end -->
                 </div>
 
-                <!--admin table-->
+                <!--Admin Table-->
                 <div class="user_table">
+                    <!-- search bar admin -->
+                    <div style="padding-left: 10;">
+                        <input type="text" placeholder="Enter keyword to search" id="search-input-admin" style="width: 50%; padding-left: 10px;" class="search-input">
+                    </div>
+                    <!-- search bar admin -->
+                    <!-- search button admin-->
                     <table class="table table table-striped">
                         <thead>
                         <tr>
@@ -178,62 +270,83 @@
                             <th scope="col">User Id</th>
                             <th scope="col">Name</th>
                             <th scope="col">Contact No</th>
-                            <th scope="col">Email</th>
-
+                           
                             <th scope="col">Role</th>
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
                         <tbody id="adminTable">
                         <!--javascript retrieving all the data from database-->
-                        <tr th:each="admin : ${adminList}">
-                            <th scope="row" th:text="${adminStat.index}+1"></th>
-                            <td th:text="${admin.userId}"></td>
-                            <td th:text="${admin.name}"></td>
-                            <td th:text="${admin.contact}"></td>
-                            <td th:text="${admin.email}"></td>
-
-                            <td th:text="${admin.role}"></td>
+                        <tr th:each="admin, stat: ${adminPagination.dataToDisplay}">
+                            <th scope="row" th:text="${stat.index + 1 + (adminPagination.totalPage * (adminPagination.currentPage - 1))}"></th>
+                            <td th:text="${admin.userId}" data-column="userId"></td>
+                            <td th:text="${admin.name}" data-column="name"></td>
+                            <td th:text="${admin.contact}" data-column="contact"></td>
+                           
+                            <td th:text="${admin.role}" data-column="role"></td>
                             <td>
-                                <button type="button" class="btn btn-warning editUserBtn editAdmin">Edit</button>
+                                <button type="button" class="btn btn-warning editUserBtn editDoctor">Edit</button>
                                 <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
                             </td>
                         </tr>
                         </tbody>
                     </table>
+                    <!--IZZATI CODE-->
+                    <!-- paging button start -->
+                    <!-- Pagination for Admin List -->
+                    <div class="d-flex justify-content-center align-items-center">
+                        <nav aria-label="Admin Pagination" th:if="${adminPagination.totalPage > 1}">
+                            <ul class="pagination">
+                                <li class="page-item" th:class="${adminPagination.prevPage < 1 ? 'disabled' : ''}">
+                                    <a class="page-link" th:href="@{/admin?pageNo=1}">&lt;</a>
+                                </li>
+                                <li th:each="i: ${#numbers.sequence(1, adminPagination.totalPage)}" class="page-item">
+                                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${i}__}"  th:text="${i}"></a>
+                                </li>
+                                <li class="page-item" th:class="${adminPagination.nextPage > adminPagination.totalPage} ? 'disabled'">
+                                    <a class="page-link" th:href="@{'/admin?pageNo=' + __${adminPagination.totalPage}__}">&gt;</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div class="d-flex justify-content-center align-items-center bg-primary bg-opacity-25 shadow-lg rounded">
+                        <p class="btn"><b>Page: <span th:text="${adminPagination.currentPage}"></span></b></p>
+                    </div>
+                    <!--IZZATI CODE-->
+                    <!-- paging button end -->
                 </div>
 
-                 <!--Assigned Patient table-->
-                 <div class="user_table">
-                    <table class="table table table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">No</th>
-                            <th scope="col">Assigned by Doctor</th>
-                            <th scope="col">Patient ID</th>
-                            <th scope="col">Patient Name</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                        </thead>
-                        <tbody id="adminTable">
-                        <!--javascript retrieving all the data from database-->
-                        <script>
-                            
-                        </script>
-                        <tr th:each="patient : ${patientList}">
-                            <th scope="row" th:text="${patientStat.index}+1"></th>
-                            <td th:text="${patient.assigned_doctor}"></td>
-                        <td th:text="${patient.userId}"></td>
-                        <td th:text="${patient.name}"></td>
-                        <td th:text="${patient.Status}"></td>
-                            
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
+                                  <!--Assigned Patient table-->
+                                  <div class="user_table">
+                                    <table class="table table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">No</th>
+                                            <th scope="col">Assigned by Doctor</th>
+                                            <th scope="col">Patient ID</th>
+                                            <th scope="col">Patient Name</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="adminTable">
+                                        <!--javascript retrieving all the data from database-->
+                                        <script>
+                                            
+                                        </script>
+                                        <tr th:each="patient : ${patientList}">
+                                            <th scope="row" th:text="${patientStat.index}+1"></th>
+                                            <td th:text="${patient.assigned_doctor}"></td>
+                                        <td th:text="${patient.userId}"></td>
+                                        <td th:text="${patient.name}"></td>
+                                        <td th:text="${patient.Status}"></td>
+                                            
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
         <!--add user page-->
         <div class="add_user_page">
             <div class="add_user_page-content">
