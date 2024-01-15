@@ -3,7 +3,9 @@ package com.SmartHealthRemoteSystem.SHSR.User.admin;
 import com.SmartHealthRemoteSystem.SHSR.User.Doctor.Doctor;
 import com.SmartHealthRemoteSystem.SHSR.User.Patient.Patient;
 import com.SmartHealthRemoteSystem.SHSR.User.Pharmacist.Pharmacist;
+import com.SmartHealthRemoteSystem.Mail.MailStructure;
 import com.SmartHealthRemoteSystem.SHSR.Service.DoctorService;
+import com.SmartHealthRemoteSystem.SHSR.Service.MailService;
 import com.SmartHealthRemoteSystem.SHSR.Service.PatientService;
 import com.SmartHealthRemoteSystem.SHSR.Service.PharmacistService;
 import com.SmartHealthRemoteSystem.SHSR.Service.UserService;
@@ -26,12 +28,14 @@ public class AdminController {
     private final PatientService patientService;
     private final DoctorService doctorService;
     private final PharmacistService pharmacistService;
+    private final MailService mailService;
 
-    public AdminController(UserService userService, PatientService patientService, DoctorService doctorService, PharmacistService pharmacistsService) {
+    public AdminController(UserService userService, PatientService patientService, DoctorService doctorService, PharmacistService pharmacistsService, MailService mailService) {
         this.userService = userService;
         this.patientService = patientService;
         this.doctorService = doctorService;
         this.pharmacistService = pharmacistsService;
+        this.mailService = mailService;
     }
 
     @GetMapping
@@ -76,6 +80,12 @@ public class AdminController {
             } else {
                 Message =userService.createUser(new User(id,name,password,contact,role,email));
             }
+            if (!Message.startsWith("Error")) {
+                // If successful, send the email
+                sendMail(email,password );
+                
+                
+            }
         }else{
             User user = new User(id,name,password,contact,role);
             if(role.equals("PATIENT")){
@@ -111,6 +121,13 @@ public class AdminController {
         model.addAttribute("pharmacistList", pharmacistList);
         return "adminDashboard";
     }
+
+    private void sendMail(String email, String password) {
+        var to = email;
+        var mailStructure = new MailStructure(to,password);
+        mailService.sendNewUserMail(to, mailStructure);
+    }
+
 
     @DeleteMapping("/deleteuser")
     public String deleteSelectedUser(@RequestParam("userIdToBeDelete") String userId,

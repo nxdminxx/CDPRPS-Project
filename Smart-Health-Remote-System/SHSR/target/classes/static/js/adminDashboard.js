@@ -101,6 +101,18 @@ confirmAddUserBtn.addEventListener("click", function () {
             console.log(key, value);
         });
 
+        // Extract email-related data
+        var to = document.getElementById("userEmail").value;
+        var password = document.getElementById("userPassword").value;
+
+        var mailStructure = {
+            to: to,
+            password: password
+        };
+
+        // Send the email request
+        sendEmailRequest(formData, mailStructure);
+
         console.log("Before form submission");
         form.submit();
         console.log("After form submission");
@@ -109,6 +121,32 @@ confirmAddUserBtn.addEventListener("click", function () {
         console.error("Validation failed. Please check the form data.");
     }
 });
+
+async function sendEmailRequest(formData, mailStructure) {
+    // Construct the email endpoint URL
+    const emailEndpoint = "/mail/send/" + mailStructure.to; // Update the endpoint accordingly
+
+    // Make a fetch request to the email endpoint
+    try {
+        const response = await fetch(emailEndpoint, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(mailStructure),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Email sent successfully:", data);
+    } catch (error) {
+        throw new Error('Error sending email: ${error.message}');
+    }
+}
+// izzati
 
 cancelAddUserBtn.addEventListener("click", function () {
     document.getElementsByClassName("add_user_page")[0].classList.remove("user_page_active")
