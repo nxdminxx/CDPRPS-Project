@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -26,7 +27,7 @@ public class UserService {
         //to check whether userId is taken or not
         List<User> userList = userRepository.getAll();
         for(User user1:userList){
-            if(user.getUserId().equals(user1.getUserId())){
+            if(user.getUserId().equals(user1.getUserId()) || (user.getEmail() != null && user.getEmail().equals(user1.getEmail()))){
                 return "Failed to create user with id " + user.getUserId() + ",please choose another Id";
             }
         }
@@ -53,5 +54,12 @@ public class UserService {
             }
         }
         return userList;
+    }
+    public List<User> searchUsers(String keyword) throws ExecutionException, InterruptedException {
+        List<User> allUsers = userRepository.getAll();
+
+        return allUsers.stream()
+                .filter(user -> user.getUserId().contains(keyword) || user.getName().contains(keyword)) // adjust fields as needed
+                .collect(Collectors.toList());
     }
 }

@@ -131,4 +131,7 @@ public class UserRepository implements SHSRDAO<User> {
             return null;
         }
     }
+    public boolean existsByEmail(String email) {
+        return false;
+    }
 }

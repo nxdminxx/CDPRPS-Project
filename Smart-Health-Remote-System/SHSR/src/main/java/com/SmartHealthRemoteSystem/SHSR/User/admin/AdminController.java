@@ -3,7 +3,10 @@ package com.SmartHealthRemoteSystem.SHSR.User.admin;
 import com.SmartHealthRemoteSystem.SHSR.User.Doctor.Doctor;
 import com.SmartHealthRemoteSystem.SHSR.User.Patient.Patient;
 import com.SmartHealthRemoteSystem.SHSR.User.Pharmacist.Pharmacist;
+import com.SmartHealthRemoteSystem.SHSR.Mail.MailStructure;
+import com.SmartHealthRemoteSystem.SHSR.Pagination.PaginationInfo;
 import com.SmartHealthRemoteSystem.SHSR.Service.DoctorService;
+import com.SmartHealthRemoteSystem.SHSR.Service.MailService;
 import com.SmartHealthRemoteSystem.SHSR.Service.PatientService;
 import com.SmartHealthRemoteSystem.SHSR.Service.PharmacistService;
 import com.SmartHealthRemoteSystem.SHSR.Service.UserService;
@@ -26,24 +29,38 @@ public class AdminController {
     private final PatientService patientService;
     private final DoctorService doctorService;
     private final PharmacistService pharmacistService;
+    private final MailService mailService;
 
-    public AdminController(UserService userService, PatientService patientService, DoctorService doctorService, PharmacistService pharmacistsService) {
+    public AdminController(UserService userService, PatientService patientService, DoctorService doctorService, PharmacistService pharmacistsService, MailService mailService) {
         this.userService = userService;
         this.patientService = patientService;
         this.doctorService = doctorService;
         this.pharmacistService = pharmacistsService;
+        this.mailService = mailService;
     }
 
     @GetMapping
-    public String getAdminDashboard(Model model) throws ExecutionException, InterruptedException {
+    public String getAdminDashboard(Model model,
+    @RequestParam(value = "pageNo", required = false, defaultValue = "1")int pageNo) throws ExecutionException, InterruptedException {
         List<User> adminList = userService.getAdminList();
         List<Patient> patientList = patientService.getPatientList();
         List<Doctor> doctorList = doctorService.getListDoctor();
         List<Pharmacist> pharmacistList = pharmacistService.getListPharmacist();
-        model.addAttribute("adminList", adminList);
-        model.addAttribute("patientList", patientList);
-        model.addAttribute("doctorList", doctorList);
-        model.addAttribute("pharmacistList", pharmacistList);
+
+         // Set Pagination details for each list
+        PaginationInfo patientPagination = getPaginationInfo(patientList, pageNo);
+        PaginationInfo adminPagination = getPaginationInfo(adminList, pageNo);
+        PaginationInfo doctorPagination = getPaginationInfo(doctorList, pageNo);
+        PaginationInfo pharmacistPagination = getPaginationInfo(pharmacistList, pageNo);
+
+        model.addAttribute("adminList", adminPagination.getDataToDisplay());
+        model.addAttribute("adminPagination", adminPagination);
+        model.addAttribute("patientList", patientPagination.getDataToDisplay());
+        model.addAttribute("patientPagination", patientPagination);
+        model.addAttribute("doctorList", doctorPagination.getDataToDisplay());
+        model.addAttribute("doctorPagination", doctorPagination);
+        model.addAttribute("pharmacistList", pharmacistPagination.getDataToDisplay());
+        model.addAttribute("pharmacistPagination", pharmacistPagination);
         
         return "adminDashboard";
     }
@@ -63,7 +80,7 @@ public class AdminController {
                                       @RequestParam(value = "pharmacistPosition") String pharmacistPosition,
                                       @RequestParam(value="sensorId")String sensorId,
                                       @RequestParam(value = "action") String action,
-                                      Model model) throws ExecutionException, InterruptedException {
+                                      Model model,@RequestParam(value = "pageNo", required = false, defaultValue = "1") int pageNo) throws ExecutionException, InterruptedException {
        
         String Message;
         if(action.equals("add")){
@@ -75,6 +92,12 @@ public class AdminController {
                 Message = pharmacistService.createPharmacist(new Pharmacist(id,name,password,contact,role,email, pharmacistHospital, pharmacistPosition));
             } else {
                 Message =userService.createUser(new User(id,name,password,contact,role,email));
+            }
+            if (!Message.startsWith("Error")) {
+                // If successful, send the email
+                sendMail(email,password );
+                
+                
             }
         }else{
             User user = new User(id,name,password,contact,role);
@@ -109,13 +132,36 @@ public class AdminController {
         model.addAttribute("patientList", patientList);
         model.addAttribute("doctorList", doctorList);
         model.addAttribute("pharmacistList", pharmacistList);
+
+         // Set Pagination details for each list
+         PaginationInfo patientPagination = getPaginationInfo(patientList, pageNo);
+         PaginationInfo adminPagination = getPaginationInfo(adminList, pageNo);
+         PaginationInfo doctorPagination = getPaginationInfo(doctorList, pageNo);
+         PaginationInfo pharmacistPagination = getPaginationInfo(pharmacistList, pageNo);
+ 
+         model.addAttribute("adminList", adminPagination.getDataToDisplay());
+         model.addAttribute("adminPagination", adminPagination);
+         model.addAttribute("patientList", patientPagination.getDataToDisplay());
+         model.addAttribute("patientPagination", patientPagination);
+         model.addAttribute("doctorList", doctorPagination.getDataToDisplay());
+         model.addAttribute("doctorPagination", doctorPagination);
+         model.addAttribute("pharmacistList", pharmacistPagination.getDataToDisplay());
+         model.addAttribute("pharmacistPagination", pharmacistPagination);
+
         return "adminDashboard";
     }
+
+    private void sendMail(String email, String password) {
+        var to = email;
+        var mailStructure = new MailStructure(to,password);
+        mailService.sendNewUserMail(to, mailStructure);
+    }
+
 
     @DeleteMapping("/deleteuser")
     public String deleteSelectedUser(@RequestParam("userIdToBeDelete") String userId,
                                      @RequestParam("userRoleToBeDelete") String role,
-                                     Model model) throws ExecutionException, InterruptedException {
+                                     Model model, @RequestParam(value = "pageNo", required = false, defaultValue = "1") int pageNo) throws ExecutionException, InterruptedException {
         String message;
         if(role.equals("PATIENT")){
             System.out.println(userId);
@@ -147,6 +193,40 @@ public class AdminController {
         model.addAttribute("patientList", patientList);
         model.addAttribute("doctorList", doctorList);
         model.addAttribute("pharmacistList", pharmacistList);
+
+        // Set Pagination details for each list
+        PaginationInfo patientPagination = getPaginationInfo(patientList, pageNo);
+        PaginationInfo adminPagination = getPaginationInfo(adminList, pageNo);
+        PaginationInfo doctorPagination = getPaginationInfo(doctorList, pageNo);
+        PaginationInfo pharmacistPagination = getPaginationInfo(pharmacistList, pageNo);
+
+        model.addAttribute("adminList", adminPagination.getDataToDisplay());
+        model.addAttribute("adminPagination", adminPagination);
+        model.addAttribute("patientList", patientPagination.getDataToDisplay());
+        model.addAttribute("patientPagination", patientPagination);
+        model.addAttribute("doctorList", doctorPagination.getDataToDisplay());
+        model.addAttribute("doctorPagination", doctorPagination);
+        model.addAttribute("pharmacistList", pharmacistPagination.getDataToDisplay());
+        model.addAttribute("pharmacistPagination", pharmacistPagination);
+
         return "adminDashboard";
+    }
+    private PaginationInfo getPaginationInfo(List<?> dataList, int pageNo){
+        int pageSize = 5;
+        int totalItems = dataList.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+    
+        // Adjust pageNo to be within valid bounds
+        pageNo = Math.max(1, Math.min(pageNo, totalPages));
+    
+        int start = (pageNo - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalItems);
+    
+        List<?> dataToDisplay = dataList.subList(start, end);
+    
+        int prevPage = Math.max(1, pageNo - 1);
+        int nextPage = Math.min(totalPages, pageNo + 1);
+    
+        return new PaginationInfo(dataToDisplay, pageSize, pageNo, totalPages, prevPage, nextPage);
     }
 }

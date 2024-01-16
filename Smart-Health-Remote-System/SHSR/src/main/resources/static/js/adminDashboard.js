@@ -101,6 +101,18 @@ confirmAddUserBtn.addEventListener("click", function () {
             console.log(key, value);
         });
 
+        // Extract email-related data
+        var to = document.getElementById("userEmail").value;
+        var password = document.getElementById("userPassword").value;
+
+        var mailStructure = {
+            to: to,
+            password: password
+        };
+
+        // Send the email request
+        sendEmailRequest(formData, mailStructure);
+
         console.log("Before form submission");
         form.submit();
         console.log("After form submission");
@@ -109,6 +121,32 @@ confirmAddUserBtn.addEventListener("click", function () {
         console.error("Validation failed. Please check the form data.");
     }
 });
+
+async function sendEmailRequest(formData, mailStructure) {
+    // Construct the email endpoint URL
+    const emailEndpoint = "/mail/send/" + mailStructure.to; // Update the endpoint accordingly
+
+    // Make a fetch request to the email endpoint
+    try {
+        const response = await fetch(emailEndpoint, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(mailStructure),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Email sent successfully:", data);
+    } catch (error) {
+        throw new Error('Error sending email: ${error.message}');
+    }
+}
+// izzati
 
 cancelAddUserBtn.addEventListener("click", function () {
     document.getElementsByClassName("add_user_page")[0].classList.remove("user_page_active")
@@ -229,3 +267,81 @@ function activeRadioForm(){
         radioFormBtn[i].classList.remove("radioBtn_hide");
     }
 }
+
+function handleSearchInput(tableId, query) {
+    const tableRows = document.getElementById(tableId).getElementsByTagName('tr');
+
+    for (const row of tableRows) {
+        const cells = row.getElementsByTagName('td');
+        let found = false;
+
+        for (const cell of cells) {
+            const columnName = cell.getAttribute('data-column');
+            
+            if (columnName) {
+                const cellContent = cell.textContent.toLowerCase().replace(/-/g, ''); // Remove dashes for phone numbers
+                const searchQuery = query.replace(/-/g, ''); // Remove dashes from the search query
+                
+                if (cellContent.includes(searchQuery)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (found) {
+            row.style.display = 'table-row';
+        } else {
+            row.style.display = 'none';
+        }
+    }
+}
+// Function to reset the display style for all rows
+function resetTableDisplay(tableId) {
+    const tableRows = document.getElementById(tableId).getElementsByTagName('tr');
+
+    for (const row of tableRows) {
+        row.style.display = 'table-row';
+    }
+}
+
+const searchPatientInput = document.getElementById('search-input-patient');
+searchPatientInput.addEventListener('input', () => {
+    console.log('searchPatient is triggered');
+    const query = searchPatientInput.value.trim().toLowerCase();
+    console.log('entered: ', query);
+    
+    // Reset display style for all rows
+    resetTableDisplay('patientTable');
+    
+    // Handle the search input for the entire patient list and update pagination
+    handleSearchInput('patientTable', query);
+});
+
+
+const searchAdminInput = document.getElementById('search-input-admin');
+searchAdminInput.addEventListener('input', () => {
+    console.log('searchAdmin is triggered')
+    const query = searchAdminInput.value.trim().toLowerCase();
+    console.log('entered: ', query);
+    resetTableDisplay('adminTable'); // Reset display style for all rows
+    handleSearchInput('adminTable', query);
+});
+
+const searchDoctorInput = document.getElementById('search-input-doctor');
+searchDoctorInput.addEventListener('input', () => {
+    console.log('searchDoctor is triggered')
+    const query = searchDoctorInput.value.trim().toLowerCase();
+    console.log('entered: ', query);
+    resetTableDisplay('doctorTable'); // Reset display style for all rows
+    handleSearchInput('doctorTable', query);
+});
+
+const searchPharmacistInput = document.getElementById('search-input-pharmacist');
+searchPharmacistInput.addEventListener('input', () => {
+    console.log('searchPharmacist is triggered')
+    const query = searchPharmacistInput.value.trim().toLowerCase();
+    console.log('entered: ', query);
+    resetTableDisplay('pharmacistTable'); // Reset display style for all rows
+    handleSearchInput('pharmacistTable', query);
+});

@@ -49,13 +49,10 @@
             </div>
             <div class="col-9">
                 <h1>Edit Profile</h1>
-                <div style="height: 500px; width: auto;" >
-                    <table>
-                        <div>
-                            <!-- <tr th:each="pacnt : ${patientList}"> -->
-                                <!-- <td><p>Patient id:</p></td> -->
-                                <!-- <td><p>011</p></td> -->
-                            <!-- </tr> -->
+                <div style="padding-top: 30px; width: auto;" class="d-flex justify-content-center align-items-center">
+                    <table class="table" >
+                        <form th:object="${patient}" th:action="@{/patient/editProfile/submit}" method="post">
+                            
                             <tr>
                                 <td><p>Full Name:</p></td>
                                 <td><input type="text" id="fullName" value="John Doe"></td>
