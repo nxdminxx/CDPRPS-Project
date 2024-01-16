@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -139,92 +140,90 @@ public class PharmacistController {
     }
 
     @PostMapping("/updateMedicine/{medId}")
-    public String updateMedicine(@PathVariable String medId, @ModelAttribute Medicine updatedMedicine, Model model) {
+    public String updateMedicine(@PathVariable String medId, @ModelAttribute Medicine updatedMedicine, RedirectAttributes redirectAttributes) {
         try {
             updatedMedicine.setMedId(medId);
             String updateResult = pharmacistService.updateMedicine(updatedMedicine);
+            LocalDateTime now = LocalDateTime.now();
+    
+            // Format the timestamp
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM dd yyyy HH:mm:ss");
+            String formattedTimestamp = now.format(formatter);
     
             if (updateResult.equals("Medicine updated successfully")) {
-                // Successful update, you can redirect or return a success message
+                String successMessage = "Medicine updated successfully at " + formattedTimestamp;
+                redirectAttributes.addFlashAttribute("successMessage", successMessage);
                 return "redirect:/pharmacist/viewMedicineList";
             } else {
-                // Error updating medicine
-                model.addAttribute("errorMessage", updateResult);
-                return "forward:/pharmacist/viewMedicineList";
+                String errorMessage = "Error updating medicine: " + updateResult;
+                redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+                return "redirect:/pharmacist/editMedicine/" + medId;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // Add a general error message if needed
-            model.addAttribute("errorMessage", "Error updating medicine.");
-            return "forward:/pharmacist/viewMedicineList";
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating medicine.");
+            return "redirect:/pharmacist/editMedicine/" + medId;
         }
     }
 
-    @DeleteMapping("/deleteMedicine")
-    public String deleteSelectedMedicine(@RequestParam("medIdToBeDelete") String medId, Model model) {
+    @DeleteMapping("/deleteMedicine/{medId}")
+    public String deleteSelectedMedicine(@PathVariable("medIdToBeDelete") String medId, Model model) {
         try {
             // Call your service method to delete the medicine based on medId
-            medicineService.deleteMedicine(medId);
-
-            // Get current timestamp for last update
-            Date timestamp = new Date();
-
-            // Format the timestamp
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd yyyy HH:mm");
-            String formattedTimestamp = dateFormat.format(timestamp);
-
-            // Set timestamp as message
-            String message = "Medicine deleted successfully at " + formattedTimestamp;
-
+            String deleteMessage = medicineService.deleteMedicine(medId);
+    
+            if (deleteMessage.startsWith("Error")) {
+                // If deletion was unsuccessful, add an error message to the model
+                model.addAttribute("errorMessage", deleteMessage);
+            } else {
+                // If deletion was successful, add a success message to the model
+                model.addAttribute("successMessage", deleteMessage);
+            }
+    
             // Update the model with the appropriate lists
             List<Medicine> medicineList = medicineService.getMedicineList();
-            model.addAttribute("message", message);
             model.addAttribute("medicineList", medicineList);
-
+    
+            // Debug statement to log the deletion message to the console
+            System.out.println("Medicine Deletion Message: " + deleteMessage);
+    
             return "viewMedicineList";  // Assuming this is the view for displaying medicine list
         } catch (Exception e) {
             // Log the exception for future reference
             e.printStackTrace();
-
+    
             // Add the error message to the model
             String errorMessage = "Error deleting medicine. Please check the logs for more information.";
             model.addAttribute("errorMessage", errorMessage);
-
+    
+            // Debug statement to log the exception to the console
+            System.out.println("Exception while deleting medicine: " + e.getMessage());
+    
             // Return to the medicine list view with the error message
             return "viewMedicineList";  // Assuming this is the view for displaying medicine list
         }
     }
 
     @PostMapping("/addStock")
-    public String addStock(@RequestParam String medId, @RequestParam int quantity, Model model)throws ExecutionException, InterruptedException {
+    public String addStock(@RequestParam String medId, @RequestParam int quantity, RedirectAttributes redirectAttributes) throws ExecutionException, InterruptedException {
         try {
             Medicine medicine = medicineService.getMedicine(medId);
-
             if (medicine != null) {
-                // Update the quantity in the database
                 medicine.setQuantity(medicine.getQuantity() + quantity);
-
-                // Call the service method to update the medicine
                 medicineService.updateMedicine(medicine);
-
-                // Get current timestamp for last stock update
-                Date timestamp = new Date();
-
-                // Format the timestamp
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd yyyy HH:mm");
-                String formattedTimestamp = dateFormat.format(timestamp);
-
-                // Set timestamp as message too
-                String message = "Stock added successfully at " + formattedTimestamp;
-
-                // Set the message in the model attribute
-                model.addAttribute("successMessage", message);
+                
+                Date now = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd yyyy HH:mm:ss");
+                String formattedTimestamp = dateFormat.format(now);
+                String successMessage = "Stock added successfully at " + formattedTimestamp;
+    
+                redirectAttributes.addFlashAttribute("successMessage", successMessage);
             }
-
             return "redirect:/pharmacist";
         } catch (Exception e) {
             e.printStackTrace();
-            return "error";
+            redirectAttributes.addFlashAttribute("errorMessage", "Error adding stock.");
+            return "redirect:/pharmacist";
         }
     }
 
@@ -235,39 +234,40 @@ public class PharmacistController {
     }
 
     @PostMapping("/addMedicine")
-    public String addMedicine(@ModelAttribute("newMedicine") Medicine newMedicine, Model model) {
+    public String addMedicine(@ModelAttribute("newMedicine") Medicine newMedicine, RedirectAttributes redirectAttributes) {
         try {
             // Check if medicine with the same name already exists
             List<Medicine> existingMedicines = medicineService.getListMedicine();
-
+    
             for (Medicine existingMedicine : existingMedicines) {
                 if (Objects.equals(existingMedicine.getMedName(), newMedicine.getMedName())) {
                     String errorMessage = "Error adding medicine. Medicine with name '" + newMedicine.getMedName() + "' already exists.";
-                    model.addAttribute("errorMessage", errorMessage);
+                    redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
                     return "redirect:/pharmacist/viewMedicineList";
                 }
             }
-
+    
             // Call the service method to add the new medicine
             medicineService.createMedicine(newMedicine);
-
+    
             // Get current timestamp for last update
             Date timestamp = new Date();
-
+    
             // Format the timestamp
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd yyyy HH:mm");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd yyyy HH:mm:ss");
             String formattedTimestamp = dateFormat.format(timestamp);
-
+    
             // Set timestamp as message too
             String message = "Medicine added successfully at " + formattedTimestamp;
-
-            // Set the message in the model attribute
-            model.addAttribute("successMessage", message);
-
+    
+            // Use RedirectAttributes to add flash attribute
+            redirectAttributes.addFlashAttribute("successMessage", message);
+    
             return "redirect:/pharmacist/viewMedicineList";
         } catch (Exception e) {
             e.printStackTrace();
-            return "error";
+            redirectAttributes.addFlashAttribute("errorMessage", "Error adding medicine.");
+            return "redirect:/pharmacist/viewMedicineList";
         }
-    }  
+    }
 }

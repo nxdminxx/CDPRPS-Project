@@ -93,7 +93,10 @@
                         </tbody>
                     </table>
 
-                    <p>Last Updated: <span id="lastUpdated">[Insert Last Updated Timestamp Here]</span></p>
+                    <p th:if="${successMessage}" th:text="'Last Updated: ' + ${successMessage}" style="color:green;"></p>
+                    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+
+
                 </div>
             </div>
         </div>
