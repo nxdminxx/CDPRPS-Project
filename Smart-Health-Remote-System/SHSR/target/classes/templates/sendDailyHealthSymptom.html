@@ -43,6 +43,7 @@
                             <a href="#" class="nav-link active" aria-current="page">
                                 Dashboard
                             </a>
+                            <a href="/Health-status/Diagnosis">Diagnosis Page</a>
                         </li>
                         <li>
                             <form th:action="@{/logout}" method="post" hidden="true" name="logoutForm">
@@ -86,7 +87,7 @@
 
                                 <h1 >Share your today's symptom!</h1>
 
-                                <form th:action="@{/Health-status/sendHealthStatus}"   method="post">
+                                <form action="http://localhost:8082/diagnosis/receiveSymptoms" method="get">
                                     <div class="list-group-item m-3 d-flex justify-content-center align-items-center bg-primary bg-opacity-50 rounded">
                                         <input type="hidden" th:value="${patient.userId}" th:name="patientId">
                                         <input type="hidden" th:value="${doctor.userId}" th:name="doctorId">

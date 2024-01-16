@@ -53,7 +53,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .successHandler(successHandler)
                 .and()
                 .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login");
+                .logoutSuccessUrl("/login")
+                .and()
+                .csrf().disable()
+                .authorizeRequests()
+                    .antMatchers("/api/diagnosis/receiveSymptoms").permitAll() // Allow access without authentication
+                    .anyRequest().authenticated()
+                .and() 
+                .httpBasic();
                
     }
 

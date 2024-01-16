@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diagnosis Page</title>
+</head>
+<body>
+    <h1>Diagnosis Page</h1>
+    <div id="diagnosis-container">
+        <!-- Diagnosis data will be displayed here -->
+    </div>
+
+    <script>
+        // Define the API endpoint URL for fetching data
+        const apiUrl = "http://localhost:8080/api/diagnosis";
+
+        // Function to fetch and display diagnosis data
+        async function fetchDiagnosisData() {
+            try {
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Assuming data is an array of diagnosis objects
+                const diagnosisContainer = document.getElementById("diagnosis-container");
+
+                // Clear any existing content in the container
+                diagnosisContainer.innerHTML = "";
+
+                // Loop through the data and display it
+                data.forEach((diagnosis) => {
+                    const diagnosisElement = document.createElement("div");
+                    diagnosisElement.innerHTML = `<strong>Patient ID:</strong> ${diagnosis.patientId}<br><strong>Diagnosis:</strong> ${diagnosis.diagnosis}<hr>`;
+                    diagnosisContainer.appendChild(diagnosisElement);
+                });
+            } catch (error) {
+                console.error("Error fetching and displaying diagnosis data:", error);
+            }
+        }
+
+        // Call the fetchDiagnosisData function to retrieve and display data when the page loads
+        fetchDiagnosisData();
+
+    </script>
+</body>
+</html>
