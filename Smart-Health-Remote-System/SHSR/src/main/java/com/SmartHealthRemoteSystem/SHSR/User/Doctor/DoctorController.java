@@ -85,6 +85,8 @@ public class DoctorController {
 
         int prevPage = currentPage - 1;
         int nextPage = currentPage + 1;
+        int globalIndex=(pageNo - 1) * pageSize;
+
         if (prevPage < 1) {
         prevPage = 1;
         }
@@ -96,6 +98,7 @@ public class DoctorController {
         //paging end
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPage", totalPages);
+        model.addAttribute("globalIndex", globalIndex);
         model.addAttribute("patientList", patientsToDisplay);
         model.addAttribute("doctor", doctor);
 

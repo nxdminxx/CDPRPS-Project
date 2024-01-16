@@ -1,6 +1,8 @@
 package com.SmartHealthRemoteSystem.SHSR.AssignPatient;
 
+import com.SmartHealthRemoteSystem.SHSR.Mail.MailStructure;
 import com.SmartHealthRemoteSystem.SHSR.Service.AssignPatientServices;
+import com.SmartHealthRemoteSystem.SHSR.Service.MailService;
 import com.SmartHealthRemoteSystem.SHSR.User.Doctor.Doctor;
 import com.SmartHealthRemoteSystem.SHSR.User.Patient.Patient;
 import com.SmartHealthRemoteSystem.SHSR.WebConfiguration.MyUserDetails;
@@ -17,9 +19,11 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/assignpatient")
 public class AssignPatientController {
     public final AssignPatientServices assignPatientServices;
+    private final MailService mailService;
 
-    public AssignPatientController(AssignPatientServices assignPatientServices) {
+    public AssignPatientController(AssignPatientServices assignPatientServices, MailService mailService) {
         this.assignPatientServices = assignPatientServices;
+        this.mailService = mailService;
     }
 
     @GetMapping
@@ -41,6 +45,15 @@ public class AssignPatientController {
         Patient patient =assignPatientServices.getPatient(patientID);
         assignPatientServices.AssignPatient(patientID,doctor.getUserId());
         List<Patient> patientList= assignPatientServices.getListPatient();
+
+        //SMTP - Izzati
+        var to = patient.getEmail();
+        var subject = "You have been ASSIGNED to a new Doctor";
+        var message = "Hello Dear "+patient.getName()+", We are to inform you that you have been ASSIGNED to a Dr. ("+doctor.getName()+"-"+doctor.getUserId()+")\n\n"
+        +"For any further information, do not hesitate to email us back.\nThank you.";
+        var mailStructure = new MailStructure(to,subject,message);
+        mailService.sendAssignedMail(to, subject, message, mailStructure);
+        
         model.addAttribute("patientList",patientList);
         model.addAttribute("doctor",doctor);
         return "assignpatient";
@@ -55,6 +68,15 @@ public class AssignPatientController {
         Patient patient =assignPatientServices.getPatient(patientID);
         assignPatientServices.UnassignDoctor(patientID,doctor.getUserId());
         List<Patient> patientList=assignPatientServices.getListPatient();
+
+        //SMTP - Izzati
+        var to = patient.getEmail();
+        var subject = "You have been UNASSIGNED from a Doctor";
+        var message = "Hello Dear "+patient.getName()+", We are to inform you that you have been UNASSIGNED from  Dr. ("+doctor.getName()+"-"+doctor.getUserId()+")\n\n"
+        +"For any further information, do not hesitate to email us back.\nThank you.";
+        var mailStructure = new MailStructure(to,subject,message);
+        mailService.sendUnassignedMail(to, subject, message, mailStructure);
+
         model.addAttribute("patientList",patientList);
         model.addAttribute("doctor",doctor);
         return "assignpatient";
@@ -69,6 +91,15 @@ public class AssignPatientController {
         Patient patient =assignPatientServices.getPatient(patientID);
         assignPatientServices.ReleasePatient(patientID,doctor.getUserId());
         List<Patient> patientList=assignPatientServices.getListPatient();
+
+        //SMTP - Izzati
+        var to = patient.getEmail();
+        var subject = "You have been RELEASED from a Doctor";
+        var message = "Hello Dear "+patient.getName()+", We are to inform you that you have been RELEASED from  Dr. ("+doctor.getName()+"-"+doctor.getUserId()+")\n\n"
+        +"For any further information, do not hesitate to email us back.\nThank you.";
+        var mailStructure = new MailStructure(to,subject,message);
+        mailService.sendUnassignedMail(to, subject, message, mailStructure);
+
         model.addAttribute("patientList",patientList);
         model.addAttribute("doctor",doctor);
         return "assignpatient";

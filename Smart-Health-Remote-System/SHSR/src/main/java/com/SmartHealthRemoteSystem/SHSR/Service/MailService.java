@@ -71,5 +71,44 @@ public class MailService {
        
         
     }
+    public void sendUnassignedMail(String mail, String subject, String message, MailStructure mailStructure){
+        
+
+        try {
+             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+
+        simpleMailMessage.setFrom(fromMail);
+        simpleMailMessage.setSubject(subject);
+        simpleMailMessage.setText(message);
+        simpleMailMessage.setTo(mail);
+
+        mailSender.send(simpleMailMessage);
+        } catch (MailException e) {
+            // Log the exception
+           e.printStackTrace();
+        }
+       
+        
+        
+    }
+    public void sendReleasedMail(String mail, String subject, String message, MailStructure mailStructure){
+        
+
+        try {
+             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+
+        simpleMailMessage.setFrom(fromMail);
+        simpleMailMessage.setSubject(subject);
+        simpleMailMessage.setText(message);
+        simpleMailMessage.setTo(mail);
+
+        mailSender.send(simpleMailMessage);
+        } catch (MailException e) {
+            // Log the exception
+           e.printStackTrace();
+        }
+       
+        
+    }
 
 }

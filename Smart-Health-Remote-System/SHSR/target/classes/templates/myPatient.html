@@ -88,7 +88,7 @@
                         <tbody class="tbody">
                             <!-- patient paging display start -->
                             <tr th:each="pacnt : ${patientList}" class="product" id="product">
-                                <td th:text="${pacntStat.index}+1"></td>
+                                <td th:text="${globalIndex + pacntStat.index + 1}"></td>
                                 <td style="width: 21%;"><span class="name" th:text="${pacnt.name}"></span></td>
                                 <!--VIEW HEALTH-->
                                 <td>
