@@ -102,170 +102,170 @@ public class DoctorController {
         return "myPatient";
     }
 
-    @GetMapping("/sensorDashboard")
-    public String getSensorDashboard(Model model, @RequestParam(value= "patientId") String patientId) throws Exception {
-        Firestore firestore = FirestoreClient.getFirestore();
-          Patient patient = doctorService.getPatient(patientId);
-          SensorDataService sensorDataService = new SensorDataService();
-          SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
+    // @GetMapping("/sensorDashboard")
+    // public String getSensorDashboard(Model model, @RequestParam(value= "patientId") String patientId) throws Exception {
+    //     Firestore firestore = FirestoreClient.getFirestore();
+    //       Patient patient = doctorService.getPatient(patientId);
+    //       SensorDataService sensorDataService = new SensorDataService();
+    //       SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
         
-          Query query = firestore.collection("SensorData")
-          .document(patient.getSensorDataId())
-          .collection("SensorDataHistory").orderBy("#", Direction.DESCENDING).limit(1);
-          ApiFuture<QuerySnapshot> querySnapshot = query.get();
-          List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+    //       Query query = firestore.collection("SensorData")
+    //       .document(patient.getSensorDataId())
+    //       .collection("SensorDataHistory").orderBy("#", Direction.DESCENDING).limit(1);
+    //       ApiFuture<QuerySnapshot> querySnapshot = query.get();
+    //       List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
         
-          int highestDocumentNumber = 0;
-          if (!documents.isEmpty()) {
-            highestDocumentNumber = documents.get(0).getLong("#").intValue();
-          }
+    //       int highestDocumentNumber = 0;
+    //       if (!documents.isEmpty()) {
+    //         highestDocumentNumber = documents.get(0).getLong("#").intValue();
+    //       }
           
-          // Create a new document with the next document number
-          DocumentReference docRef = firestore.collection("SensorData")
-          .document(patient.getSensorDataId())
-          .collection("SensorDataHistory")
-          .document("sensordata" + String.format("%03d", highestDocumentNumber + 1));
+    //       // Create a new document with the next document number
+    //       DocumentReference docRef = firestore.collection("SensorData")
+    //       .document(patient.getSensorDataId())
+    //       .collection("SensorDataHistory")
+    //       .document("sensordata" + String.format("%03d", highestDocumentNumber + 1));
   
-    // Populate the document with the sensor data fields
-          Map<String, Object> data = new HashMap<>();
-          data.put("#", highestDocumentNumber +1 );
-          data.put("Heart_Rate", sensorData.getHeart_Rate());
-          data.put("bodyTemperature", sensorData.getBodyTemperature());
-          data.put("ecgReading", sensorData.getEcgReading());
-          data.put("oxygenReading", sensorData.getOxygenReading());
-          data.put("sensorDataId", sensorData.getSensorDataId());
-          data.put("timestamp", sensorData.getTimestamp());
+    // // Populate the document with the sensor data fields
+    //       Map<String, Object> data = new HashMap<>();
+    //       data.put("#", highestDocumentNumber +1 );
+    //       data.put("Heart_Rate", sensorData.getHeart_Rate());
+    //       data.put("bodyTemperature", sensorData.getBodyTemperature());
+    //       data.put("ecgReading", sensorData.getEcgReading());
+    //       data.put("oxygenReading", sensorData.getOxygenReading());
+    //       data.put("sensorDataId", sensorData.getSensorDataId());
+    //       data.put("timestamp", sensorData.getTimestamp());
   
-          model.addAttribute("sensorDataList",sensorData);
-          model.addAttribute("patientid",patientId);
+    //       model.addAttribute("sensorDataList",sensorData);
+    //       model.addAttribute("patientid",patientId);
   
-          // Write the data to the document
-          docRef.set(data);
+    //       // Write the data to the document
+    //       docRef.set(data);
 
          
        
-        Iterable<DocumentReference> documentReference = firestore.collection("SensorData")
-        .document(patient.getSensorDataId())
-        .collection("SensorDataHistory").listDocuments();
-        Iterator<DocumentReference> iterator = documentReference.iterator();
+    //     Iterable<DocumentReference> documentReference = firestore.collection("SensorData")
+    //     .document(patient.getSensorDataId())
+    //     .collection("SensorDataHistory").listDocuments();
+    //     Iterator<DocumentReference> iterator = documentReference.iterator();
 
-        List<SensorData> sensorDataList = new ArrayList<>();
-        SensorData sensorDatahistory;
-        while (iterator.hasNext()) {
-            DocumentReference documentReference1=iterator.next();
-            ApiFuture<DocumentSnapshot> future = documentReference1.get();
-            DocumentSnapshot document = future.get();
-            sensorData = document.toObject(SensorData.class);
-            sensorDataList.add(sensorData);
-            model.addAttribute("sensorDataListHistory",sensorDataList);
-            System.out.println("-------------------------------------------------------------------------------");
-            System.out.println(sensorDataList);
-            System.out.println("-------------------------------------------------------------------------------");
+    //     List<SensorData> sensorDataList = new ArrayList<>();
+    //     SensorData sensorDatahistory;
+    //     while (iterator.hasNext()) {
+    //         DocumentReference documentReference1=iterator.next();
+    //         ApiFuture<DocumentSnapshot> future = documentReference1.get();
+    //         DocumentSnapshot document = future.get();
+    //         sensorData = document.toObject(SensorData.class);
+    //         sensorDataList.add(sensorData);
+    //         model.addAttribute("sensorDataListHistory",sensorDataList);
+    //         System.out.println("-------------------------------------------------------------------------------");
+    //         System.out.println(sensorDataList);
+    //         System.out.println("-------------------------------------------------------------------------------");
 
-        }
+    //     }
 
-        model.addAttribute("success","success");
+    //     model.addAttribute("success","success");
        
-          return "sensorDashboard";
-      }
+    //       return "sensorDashboard";
+    //   }
 
 
-    @PostMapping("/create")
-    public String saveSensorData(Model model, @RequestParam(value= "sensordata") String sensordata,
-     @ModelAttribute("patientid") String patientid) throws Exception {
-        SensorDataService sensorDataService = new SensorDataService();
-        Firestore firestore = FirestoreClient.getFirestore();
-        // Create a new document with the next document number
-        DocumentReference docRef = firestore.collection("SensorData").document(sensordata);
-        DocumentReference patientRef = firestore.collection("Patient").document(patientid);
+    // @PostMapping("/create")
+    // public String saveSensorData(Model model, @RequestParam(value= "sensordata") String sensordata,
+    //  @ModelAttribute("patientid") String patientid) throws Exception {
+    //     SensorDataService sensorDataService = new SensorDataService();
+    //     Firestore firestore = FirestoreClient.getFirestore();
+    //     // Create a new document with the next document number
+    //     DocumentReference docRef = firestore.collection("SensorData").document(sensordata);
+    //     DocumentReference patientRef = firestore.collection("Patient").document(patientid);
 
     // Populate the document with the sensor data fields
     
-    Map<String, Object> data = new HashMap<>();
-        data.put("Heart_Rate", 0);
-            data.put("bodyTemperature", 0);
-            data.put("ecgReading", 0);
-            data.put("oxygenReading", 0);
-            data.put("sensorDataId", sensordata);
-            data.put("timestamp", FieldValue.serverTimestamp());
+    // Map<String, Object> data = new HashMap<>();
+    //     data.put("Heart_Rate", 0);
+    //         data.put("bodyTemperature", 0);
+    //         data.put("ecgReading", 0);
+    //         data.put("oxygenReading", 0);
+    //         data.put("sensorDataId", sensordata);
+    //         data.put("timestamp", FieldValue.serverTimestamp());
 
-            // Write the data to the document
-            docRef.set(data);
+    //         // Write the data to the document
+    //         docRef.set(data);
 
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("sensorDataId", sensordata);
-            patientRef.update(updates);
-            Patient patient = doctorService.getPatient(patientid);
-            SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
-            model.addAttribute("sensorDataList",sensorData);
-            model.addAttribute("patientid",patientid);
+    //         Map<String, Object> updates = new HashMap<>();
+    //         updates.put("sensorDataId", sensordata);
+    //         patientRef.update(updates);
+    //         Patient patient = doctorService.getPatient(patientid);
+    //         SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
+    //         model.addAttribute("sensorDataList",sensorData);
+    //         model.addAttribute("patientid",patientid);
         
-            return "redirect:/doctor/sensorDashboard?patientId=" + patientid;
-        }
+    //         return "redirect:/doctor/sensorDashboard?patientId=" + patientid;
+    //     }
 
-      @PostMapping("/savehistory")
-      public String savehistory(Model model, @RequestParam(value= "patientid") String patientId) throws Exception {
-          Firestore firestore = FirestoreClient.getFirestore();
-          Patient patient = doctorService.getPatient(patientId);
-          SensorDataService sensorDataService = new SensorDataService();
-          SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
+    //   @PostMapping("/savehistory")
+    //   public String savehistory(Model model, @RequestParam(value= "patientid") String patientId) throws Exception {
+    //       Firestore firestore = FirestoreClient.getFirestore();
+    //       Patient patient = doctorService.getPatient(patientId);
+    //       SensorDataService sensorDataService = new SensorDataService();
+    //       SensorData sensorData = sensorDataService.getSensorData(patient.getSensorDataId());
         
-          Query query = firestore.collection("SensorData")
-          .document(patient.getSensorDataId())
-          .collection("SensorDataHistory").orderBy("#", Direction.DESCENDING).limit(1);
-          ApiFuture<QuerySnapshot> querySnapshot = query.get();
-          List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+    //       Query query = firestore.collection("SensorData")
+    //       .document(patient.getSensorDataId())
+    //       .collection("SensorDataHistory").orderBy("#", Direction.DESCENDING).limit(1);
+    //       ApiFuture<QuerySnapshot> querySnapshot = query.get();
+    //       List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
         
-          int highestDocumentNumber = 0;
-          if (!documents.isEmpty()) {
-            highestDocumentNumber = documents.get(0).getLong("#").intValue();
-          }
+    //       int highestDocumentNumber = 0;
+    //       if (!documents.isEmpty()) {
+    //         highestDocumentNumber = documents.get(0).getLong("#").intValue();
+    //       }
           
-          // Create a new document with the next document number
-          DocumentReference docRef = firestore.collection("SensorData")
-          .document(patient.getSensorDataId())
-          .collection("SensorDataHistory")
-          .document("sensordata" + String.format("%03d", highestDocumentNumber + 1));
+    //       // Create a new document with the next document number
+    //       DocumentReference docRef = firestore.collection("SensorData")
+    //       .document(patient.getSensorDataId())
+    //       .collection("SensorDataHistory")
+    //       .document("sensordata" + String.format("%03d", highestDocumentNumber + 1));
   
     // Populate the document with the sensor data fields
-          Map<String, Object> data = new HashMap<>();
-          data.put("#", highestDocumentNumber +1 );
-          data.put("Heart_Rate", sensorData.getHeart_Rate());
-          data.put("bodyTemperature", sensorData.getBodyTemperature());
-          data.put("ecgReading", sensorData.getEcgReading());
-          data.put("oxygenReading", sensorData.getOxygenReading());
-          data.put("sensorDataId", sensorData.getSensorDataId());
-          data.put("timestamp", sensorData.getTimestamp());
+        //   Map<String, Object> data = new HashMap<>();
+        //   data.put("#", highestDocumentNumber +1 );
+        //   data.put("Heart_Rate", sensorData.getHeart_Rate());
+        //   data.put("bodyTemperature", sensorData.getBodyTemperature());
+        //   data.put("ecgReading", sensorData.getEcgReading());
+        //   data.put("oxygenReading", sensorData.getOxygenReading());
+        //   data.put("sensorDataId", sensorData.getSensorDataId());
+        //   data.put("timestamp", sensorData.getTimestamp());
   
-          model.addAttribute("sensorDataList",sensorData);
-          model.addAttribute("patientid",patientId);
+        //   model.addAttribute("sensorDataList",sensorData);
+        //   model.addAttribute("patientid",patientId);
   
-          // Write the data to the document
-          docRef.set(data);
+        //   // Write the data to the document
+        //   docRef.set(data);
 
-        Iterable<DocumentReference> documentReference = firestore.collection("SensorData")
-        .document(patient.getSensorDataId())
-        .collection("SensorDataHistory").listDocuments();
-        Iterator<DocumentReference> iterator = documentReference.iterator();
+        // Iterable<DocumentReference> documentReference = firestore.collection("SensorData")
+        // .document(patient.getSensorDataId())
+        // .collection("SensorDataHistory").listDocuments();
+        // Iterator<DocumentReference> iterator = documentReference.iterator();
 
-        List<SensorData> sensorDataList = new ArrayList<>();
-        SensorData sensorDatahistory;
+        // List<SensorData> sensorDataList = new ArrayList<>();
+        // SensorData sensorDatahistory;
 
-        while (iterator.hasNext()) {
-            DocumentReference documentReference1=iterator.next();
-            ApiFuture<DocumentSnapshot> future = documentReference1.get();
-            DocumentSnapshot document = future.get();
-            sensorData = document.toObject(SensorData.class);
-            sensorDataList.add(sensorData);
-            model.addAttribute("sensorDataListHistory",sensorDataList);
-            System.out.println("-------------------------------------------------------------------------------");
-            System.out.println(sensorDataList);
-            System.out.println("-------------------------------------------------------------------------------");
-        }
-        model.addAttribute("success","success");
+    //     while (iterator.hasNext()) {
+    //         DocumentReference documentReference1=iterator.next();
+    //         ApiFuture<DocumentSnapshot> future = documentReference1.get();
+    //         DocumentSnapshot document = future.get();
+    //         sensorData = document.toObject(SensorData.class);
+    //         sensorDataList.add(sensorData);
+    //         model.addAttribute("sensorDataListHistory",sensorDataList);
+    //         System.out.println("-------------------------------------------------------------------------------");
+    //         System.out.println(sensorDataList);
+    //         System.out.println("-------------------------------------------------------------------------------");
+    //     }
+    //     model.addAttribute("success","success");
        
-          return "sensorDashboard";
-      }
+    //       return "sensorDashboard";
+    //   }
 
     //--------------IZZAT-----------------------------------------
 
