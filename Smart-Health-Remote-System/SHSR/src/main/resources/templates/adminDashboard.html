@@ -63,15 +63,16 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">No</th>
-                <th scope="col">User Id</th>
-                <th scope="col">Name</th>
-                <th scope="col">Contact No</th>
-                <th scope="col">Role</th>
-                <th scope="col">Emergency contact</th>
-                <th scope="col">Address</th>
-                <th scope="col">Sensor Id</th>
-                <th scope="col">Action</th>
+                <th scope="col" style="width: 2%;" class="text-center">No</th>
+                <th scope="col" style="width: 10%;" class="text-center">User Id</th>
+                <th scope="col" style="width: 15%;" class="text-center">Name</th>
+                <th scope="col" style="width: 15%;" class="text-center">Contact No</th>
+                <th scope="col" style="width: 10%;" class="text-center">Email</th>
+
+                <th scope="col" style="width: 10%;" class="text-center">Emergency contact</th>
+                <th scope="col" style="width: 10%;" class="text-center">Address</th>
+                <th scope="col" style="width: 10%;" class="text-center">Sensor Id</th>
+                <th scope="col" style="width: 30%;" class="text-center">Action</th>
             </tr>
         </thead>
         <tbody id="patientTable" class="patientTable">
@@ -82,15 +83,15 @@
     /*]]>*/
 </script>
             <tr th:each="patient, stat: ${patientList}">
-                <th scope="row" th:text="${stat.index + 1 + (patientPagination.totalPage * (patientPagination.currentPage - 1))}"></th>
-                <td th:text="${patient.userId}" data-column="userId"></td>
-                <td th:text="${patient.name}" data-column="name"></td>
-                <td th:text="${patient.contact}" data-column="contact"></td>
-                <td th:text="${patient.role}" data-column="role"></td>
-                <td th:text="${patient.emergencyContact}" data-column="emergencyContact"></td>
-                <td th:text="${patient.address}" data-column="address"></td>
-                <td th:text="${patient.sensorDataId}" data-column="sensorDataId"></td>
-                <td>
+                <th class="text-center"scope="row" th:text="${stat.index + 1 + (patientPagination.totalPage * (patientPagination.currentPage - 1))}"></th>
+                <td class="text-center" th:text="${patient.userId}" data-column="userId"></td>
+                <td class="text-center" th:text="${patient.name}" data-column="name"></td>
+                <td class="text-center" th:text="${patient.contact}" data-column="contact"></td>
+                <td class="text-center"th:text="${patient.email}" data-column="email"></td>
+                <td class="text-center" th:text="${patient.emergencyContact}" data-column="emergencyContact"></td>
+                <td class="text-center" th:text="${patient.address}" data-column="address"></td>
+                <td class="text-center"th:text="${patient.sensorDataId}" data-column="sensorDataId"></td>
+                <td class="text-center">
                     <button type="button" class="btn btn-warning editUserBtn editPatient">Edit</button>
                     <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
                 </td>
@@ -135,29 +136,27 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th scope="col">No</th>
-                            <th scope="col">User Id</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Contact No</th>
+                            <th scope="col" style="width: 2%;" class="text-center">No</th>
+                            <th scope="col" style="width: 10%;" class="text-center">User Id</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Name</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Contact No</th>
                            
-                            <th scope="col">Role</th>
-                            <th scope="col">Hospital</th>
-                            <th scope="col">Position</th>
-                            <th scope="col">Action</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Hospital</th>
+                            <th scope="col" style="width: 10%;" class="text-center">Position</th>
+                            <th scope="col" style="width: 50%;" class="text-center">Action</th>
                         </tr>
                         </thead>
                         <tbody id="doctorTable" class="doctorTable">
                         <!--javascript retrieving all the data from database-->
                         <tr th:each="doctor, stat: ${doctorPagination.dataToDisplay}">
-                            <th scope="row" th:text="${stat.index + 1 + (doctorPagination.totalPage * (doctorPagination.currentPage - 1))}"></th>
-                            <td th:text="${doctor.userId}" data-column="userId"></td>
-                            <td th:text="${doctor.name}" data-column="name"></td>
-                            <td th:text="${doctor.contact}" data-column="contact"></td>
+                            <th class="text-center" scope="row" th:text="${stat.index + 1 + (doctorPagination.totalPage * (doctorPagination.currentPage - 1))}"></th>
+                            <td class="text-center"th:text="${doctor.userId}" data-column="userId"></td>
+                            <td class="text-center"th:text="${doctor.name}" data-column="name"></td>
+                            <td class="text-center"th:text="${doctor.contact}" data-column="contact"></td>
                            
-                            <td th:text="${doctor.role}" data-column="role"></td>
-                            <td th:text="${doctor.hospital}" data-column="hospital"></td>
-                            <td th:text="${doctor.position}" data-column="position"></td>
-                            <td>
+                            <td class="text-center" th:text="${doctor.hospital}" data-column="hospital"></td>
+                            <td class="text-center" th:text="${doctor.position}" data-column="position"></td>
+                            <td class="text-center">
                                 <button type="button" class="btn btn-warning editUserBtn editDoctor">Edit</button>
                                 <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
                             </td>
@@ -200,31 +199,29 @@
                     <table class="table table table-striped">
                         <thead>
                         <tr>
-                            <th scope="col">No</th>
-                            <th scope="col">User Id</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Contact No</th>
-                            <th scope="col">Email</th>
+                            <th scope="col" style="width: 2%;" class="text-center">No</th>
+                            <th scope="col" style="width: 10%;" class="text-center">User Id</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Name</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Contact No</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Email</th>
 
-                            <th scope="col">Role</th>
-                            <th scope="col">Hospital</th>
-                            <th scope="col">Position</th>
-                            <th scope="col">Action</th>
+                            <th scope="col" style="width: 15%;" class="text-center">Hospital</th>
+                            <th scope="col" style="width: 10%;" class="text-center">Position</th>
+                            <th scope="col" style="width: 50%;" class="text-center">Action</th>
                         </tr>
                         </thead>
                         <tbody id="pharmacistTable" class="pharmacistTable">
                         <!--javascript retrieving all the data from database-->
                         <tr th:each="pharmacist, stat: ${pharmacistPagination.dataToDisplay}">
-                            <th scope="row" th:text="${stat.index + 1 + (pharmacistPagination.totalPage * (pharmacistPagination.currentPage - 1))}"></th>
-                            <td th:text="${pharmacist.userId}" data-column="userId"></td>
-                            <td th:text="${pharmacist.name}" data-column="name"></td>
-                            <td th:text="${pharmacist.contact}" data-column="contact"></td>
-                            <td th:text="${pharmacist.email}" data-column="email"></td>
+                            <th class="text-center" scope="row" th:text="${stat.index + 1 + (pharmacistPagination.totalPage * (pharmacistPagination.currentPage - 1))}"></th>
+                            <td class="text-center" th:text="${pharmacist.userId}" data-column="userId"></td>
+                            <td class="text-center" th:text="${pharmacist.name}" data-column="name"></td>
+                            <td class="text-center" th:text="${pharmacist.contact}" data-column="contact"></td>
+                            <td class="text-center" th:text="${pharmacist.email}" data-column="email"></td>
 
-                            <td th:text="${pharmacist.role}" data-column="role"></td>
-                            <td th:text="${pharmacist.hospital}" data-column="hospital"></td>
-                            <td th:text="${pharmacist.position}" data-column="position"></td>
-                            <td>
+                            <td class="text-center" th:text="${pharmacist.hospital}" data-column="hospital"></td>
+                            <td class="text-center" th:text="${pharmacist.position}" data-column="position"></td>
+                            <td class="text-center">
                                 <button type="button" class="btn btn-warning editUserBtn editPharmacist">Edit</button>
                                 <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
                             </td>
@@ -266,25 +263,25 @@
                     <table class="table table table-striped">
                         <thead>
                         <tr>
-                            <th scope="col">No</th>
-                            <th scope="col">User Id</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Contact No</th>
+                            <th scope="col" class="text-center">No</th>
+                            <th scope="col" class="text-center">User Id</th>
+                            <th scope="col" class="text-center">Name</th>
+                            <th scope="col" class="text-center">Contact No</th>
                            
-                            <th scope="col">Role</th>
-                            <th scope="col">Action</th>
+                            <th scope="col" class="text-center">Role</th>
+                            <th scope="col" class="text-center">Action</th>
                         </tr>
                         </thead>
                         <tbody id="adminTable">
                         <!--javascript retrieving all the data from database-->
                         <tr th:each="admin, stat: ${adminPagination.dataToDisplay}">
-                            <th scope="row" th:text="${stat.index + 1 + (adminPagination.totalPage * (adminPagination.currentPage - 1))}"></th>
-                            <td th:text="${admin.userId}" data-column="userId"></td>
-                            <td th:text="${admin.name}" data-column="name"></td>
-                            <td th:text="${admin.contact}" data-column="contact"></td>
+                            <th class="text-center"scope="row" th:text="${stat.index + 1 + (adminPagination.totalPage * (adminPagination.currentPage - 1))}"></th>
+                            <td class="text-center"th:text="${admin.userId}" data-column="userId"></td>
+                            <td class="text-center"th:text="${admin.name}" data-column="name"></td>
+                            <td class="text-center" th:text="${admin.contact}" data-column="contact"></td>
                            
-                            <td th:text="${admin.role}" data-column="role"></td>
-                            <td>
+                            <td class="text-center" th:text="${admin.role}" data-column="role"></td>
+                            <td class="text-center">
                                 <button type="button" class="btn btn-warning editUserBtn editDoctor">Edit</button>
                                 <button type="button" class="btn btn-danger deleteUserBtn">Delete</button>
                             </td>
@@ -322,11 +319,11 @@
                                     <table class="table table table-striped">
                                         <thead>
                                         <tr>
-                                            <th scope="col">No</th>
-                                            <th scope="col">Assigned by Doctor</th>
-                                            <th scope="col">Patient ID</th>
-                                            <th scope="col">Patient Name</th>
-                                            <th scope="col">Status</th>
+                                            <th scope="col" class="text-center">No</th>
+                                            <th scope="col" class="text-center">Assigned by Doctor</th>
+                                            <th scope="col" class="text-center">Patient ID</th>
+                                            <th scope="col" class="text-center">Patient Name</th>
+                                            <th scope="col" class="text-center">Status</th>
                                         </tr>
                                         </thead>
                                         <tbody id="adminTable">
@@ -334,12 +331,12 @@
                                         <script>
                                             
                                         </script>
-                                        <tr th:each="patient : ${patientList}">
-                                            <th scope="row" th:text="${patientStat.index}+1"></th>
-                                            <td th:text="${patient.assigned_doctor}"></td>
-                                        <td th:text="${patient.userId}"></td>
-                                        <td th:text="${patient.name}"></td>
-                                        <td th:text="${patient.Status}"></td>
+                                        <tr class="text-center" th:each="patient : ${patientList}">
+                                            <th class="text-center" scope="row" th:text="${patientStat.index}+1"></th>
+                                            <td class="text-center" th:text="${patient.assigned_doctor}"></td>
+                                        <td class="text-center" th:text="${patient.userId}"></td>
+                                        <td class="text-center" th:text="${patient.name}"></td>
+                                        <td class="text-center" th:text="${patient.Status}"></td>
                                             
                                         </tr>
                                         </tbody>
@@ -347,6 +344,7 @@
                                 </div>
                             </div>
                         </div>
+                        
         <!--add user page-->
         <div class="add_user_page">
             <div class="add_user_page-content">
