@@ -37,16 +37,13 @@ and open the template in the editor.
         <div class="row gx-5">
             <div class="col ">
                 <div class="d-flex shadow flex-column flex-shrink-0 p-3 bg-primary bg-opacity-25 rounded">
-                    <a th:href="@{/doctor}" class="card-link"
-                    style="text-decoration: none; color: black;">
-                        <div class="card bg-primary bg-opacity-25 rounded">
-                            <img class="card-img-top" src="/image/img_avatar1.png" alt="Card image">
-                                <div class="card-body">
-                                    <h3 class="card-title" th:text="${doctor.name}"></h3>
-                                    <p class="card-text" th:text="${doctor.position}"></p>
-                                </div>
+                    <div class="card bg-primary bg-opacity-25 rounded">
+                        <img class="card-img-top" th:src="'data:image/png;base64,' + ${doctor.profilePicture}" alt="Card image" >
+                        <div class="card-body">
+                            <h3 class="card-title" th:text="${doctor.name}"></h3>
+                            <p class="card-text" th:text="${doctor.position}"></p>
                         </div>
-                    </a>
+                    </div>
                     <hr>
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li class="nav-item">
@@ -89,7 +86,7 @@ and open the template in the editor.
                 <div style="padding-top: 30px">
                 <table class="table">
                     <!-- search button -->
-                    <input type="text" placeholder="Enter keyword to search" id="search-input" style="width: 50%" class="search-input" >
+                    <!-- <input type="text" placeholder="Enter keyword to search" id="search-input" style="width: 50%" class="search-input" > -->
                     <!-- search button end-->
                     <thead>
                     <th>No</th>
@@ -99,18 +96,19 @@ and open the template in the editor.
                     </thead>
                     <tbody>
                     
-                    
-                    <tr th:each="patient:${patientList}" class="product" id="product">
+                        <form th:action="@{/assignpatient}" method="get">
+                            <input type="text" name="searchQuery" placeholder="Enter keyword to search" th:value="${searchQuery}" style="width: 50%">
+                            <input type="hidden" name="pageNo" th:value="${currentPage}">
+                            <input type="hidden" name="pageSize" th:value="${pageSize}">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
+                    <tr th:each="patient, patientStat : ${patientList}" class="product" id="product">
 
-                        <td th:text="${patientStat.index}+1"></td>
+                        <td th:text="${startIndex + patientStat.index + 1}"></td>
                         <td class="id" th:text="${patient.userId}"></td>
                         <td class="name" th:text="${patient.name}"></td>
                         <td>
-                            <form th:action="@{/assignpatient/assigntoDoctor}" method="post" class="assignform" hidden="true"
-                                  th:object="${patient}">
-                                <input type="hidden" th:value="*{userId}" name="patientId">
-
-                            </form>
+                            
                             <div class="confirmation">
 
                                 <button type="button" class="btn btn-primary assignbtn">Assign Patient</button>
@@ -124,6 +122,22 @@ and open the template in the editor.
 
                 </table>
                 </div>
+                
+                <!-- Pagination Controls -->
+                <nav aria-label="Patient navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/assignpatient(pageNo=${currentPage - 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Previous</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''">
+                            <a class="page-link" th:href="@{/assignpatient(pageNo=${i}, pageSize=${pageSize}, searchQuery=${searchQuery})}" th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                            <a class="page-link" th:href="@{/assignpatient(pageNo=${currentPage + 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+                
 
                 <div class="confirmation_page">
                     <div class="confirmation_page-content">
@@ -168,26 +182,54 @@ and open the template in the editor.
         $(document).on('click', '.confirmBtn', function () {
             $('.assignform').get(i).submit();
         })
+            //izzati
+        //     $.ajax({
+        //         type: 'POST',
+        //         url: '/assignpatient/',  // Update the URL to match your server endpoint
+        //         data: {
+        //             patientId: $('.id').eq(i).text(),
+        //             doctorId: '${doctor.userId}',
+        //             doctorName: '${doctor.name}'
+        //         },
+        //         success: function (response) {
+        //             console.log('Email sent successfully');
+        //             // Continue with the form submission
+        //             $('.assignform').get(i).submit();
+        //         },
 
+           
+
+        //    error: function (error) {
+        //             console.error('Error sending email: ', error);
+        //             // Handle the error as needed
+        //         }
+        //     });
+        // })
+
+        
 
     })
 
+    // const searchInput = document.getElementById('search-input');
+    // searchInput.addEventListener('input', () => {
+    // const query = searchInput.value.trim().toLowerCase();
+
+    // const patientList = document.getElementsByClassName('product');
+
+    // for (const patient of patientList) {
+    //     const name = patient.getElementsByClassName('name')[0].textContent;
+    //     const id = patient.getElementsByClassName('id')[0].textContent;
+
+
+    //     if (name.includes(query) ||id.includes(query) ) {
+    //         patient.style.display = 'table-row';
+    //     } else {
+    //         patient.style.display = 'none';
+    //     }
+    // }
+    // });
     const searchInput = document.getElementById('search-input');
     searchInput.addEventListener('input', () => {
-    const query = searchInput.value.trim().toLowerCase();
-
-    const patientList = document.getElementsByClassName('product');
-
-    for (const patient of patientList) {
-        const name = patient.getElementsByClassName('name')[0].textContent;
-        const id = patient.getElementsByClassName('id')[0].textContent;
-
-
-        if (name.includes(query) ||id.includes(query) ) {
-            patient.style.display = 'table-row';
-        } else {
-            patient.style.display = 'none';
-        }
-    }
+        // ... JavaScript code for client-side filtering ...
     });
 </script>
