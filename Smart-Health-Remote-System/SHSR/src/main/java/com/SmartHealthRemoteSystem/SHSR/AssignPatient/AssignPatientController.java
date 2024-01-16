@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/assignpatient")
@@ -27,13 +28,38 @@ public class AssignPatientController {
     }
 
     @GetMapping
-    public String AssignPatientForm(Model model) throws ExecutionException, InterruptedException{
+    public String AssignPatientForm(Model model,  @RequestParam(defaultValue = "0") int pageNo, 
+    @RequestParam(defaultValue = "5") int pageSize, @RequestParam(defaultValue = "") String searchQuery) throws ExecutionException, InterruptedException{
+        
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = assignPatientServices.getDoctor(myUserDetails.getUsername());
-        List<Patient> patientList= assignPatientServices.getListPatient();
+        // List<Patient> patientList= assignPatientServices.getListPatient();
+
+        List<Patient> allPatients = assignPatientServices.getListPatient();
+  
+         if (!searchQuery.isEmpty()) {
+        allPatients = allPatients.stream()
+                                 .filter(p -> p.getName().toLowerCase().contains(searchQuery.toLowerCase()) 
+                                           || p.getUserId().toString().contains(searchQuery))
+                                 .collect(Collectors.toList());
+    }
+
+        int total = allPatients.size();
+        int start = Math.min(pageNo * pageSize, total);
+        int end = Math.min((pageNo + 1) * pageSize, total);
+        int startIndex = pageNo * pageSize;
+
+
+        List<Patient> patientList = allPatients.subList(start, end);
+
+        model.addAttribute("startIndex", startIndex);
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", (total + pageSize - 1) / pageSize);
         model.addAttribute("patientList", patientList);
         model.addAttribute("doctor",doctor);
+        model.addAttribute("searchQuery", searchQuery);
+
         return "assignpatient";
     }
 
