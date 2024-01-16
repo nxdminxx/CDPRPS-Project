@@ -43,7 +43,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a th:href="@{/pharmacist/viewMedicineList}" class="nav-link link-dark f">
+                                <a th:href="@{/pharmacist/viewMedicineList(pageNo=0)}" class="nav-link link-dark f">
                                     Medicine List
                                 </a>
                             </li>
@@ -67,6 +67,15 @@
                     <h1 d-flex justify-content-start>Pharmacist Dashboard</h1>
                     <br>
                     <h3>Medicine Stock information</h3>
+                    
+                    <!--Search-->
+                    <form th:action="@{/pharmacist}" method="get">
+                        <input type="text" name="searchQuery" placeholder="Enter keyword to search" th:value="${searchQuery}" style="width: 50%">
+                        <input type="hidden" name="pageNo" th:value="${currentPage}">
+                        <input type="hidden" name="pageSize" th:value="${pageSize}">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+
                     <table class="table table-striped" border="1">
                         <thead>
                             <tr>
@@ -78,7 +87,7 @@
                         </thead>
                         <tbody>
                             <tr th:each="medicine, stat : ${medicineStock}">
-                                <td class="text-center" th:text="${stat.index + 1}"></td>
+                                <td class="text-center" th:text="${startIndex + stat.index + 1}"></td>
                                 <td class="text-center" th:text="${medicine.medName}"></td>
                                 <td class="text-center" th:text="${medicine.quantity}"></td>
                                 <td class="text-center">
@@ -92,6 +101,20 @@
                             </tr>
                         </tbody>
                     </table>
+                    <!-- Pagination Controls -->
+                    <nav aria-label="Patient navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/pharmacist(pageNo=${currentPage - 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''">
+                                <a class="page-link" th:href="@{/pharmacist(pageNo=${i}, pageSize=${pageSize}, searchQuery=${searchQuery})}" th:text="${i + 1}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/pharmacist(pageNo=${currentPage + 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>   
 
                     <p>Last Updated: <span id="lastUpdated">[Insert Last Updated Timestamp Here]</span></p>
                 </div>
@@ -106,6 +129,11 @@
     <script>
         // Use JavaScript to update the last updated timestamp
         document.getElementById("lastUpdated").innerText = new Date().toLocaleString();
+
+        const searchInput = document.getElementById('search-input');
+        searchInput.addEventListener('input', () => {
+        // ... JavaScript code for client-side filtering ...
+    });
     </script>
 
 </body>

@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @RequestMapping("/pharmacist")
 @Controller
@@ -63,14 +64,36 @@ public class PharmacistController {
     }
 
     @GetMapping
-    public String pharmacistDashboard(Model model) throws ExecutionException, InterruptedException {
+    public String pharmacistDashboard(Model model,  @RequestParam(defaultValue = "0") int pageNo, 
+    @RequestParam(defaultValue = "5") int pageSize, @RequestParam(defaultValue = "") String searchQuery) throws ExecutionException, InterruptedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
         Pharmacist pharmacist = pharmacistService.getPharmacist(myUserDetails.getUsername());
         
-        List<Medicine> medicineStock = pharmacistService.getListMedicine();
+        List<Medicine> allMedicine = pharmacistService.getListMedicine();
+
+        if (!searchQuery.isEmpty()) {
+            allMedicine = allMedicine.stream()
+                             .filter(p -> p.getMedName().toLowerCase().contains(searchQuery.toLowerCase()) 
+                                       || p.getMedId().toString().contains(searchQuery))
+                             .collect(Collectors.toList());
+        }
+
+        int total = allMedicine.size();
+        int start = Math.min(pageNo * pageSize, total);
+        int end = Math.min((pageNo + 1) * pageSize, total);
+        int startIndex = pageNo * pageSize;
+
+        List<Medicine> medicineStock = allMedicine.subList(start, end);
+
+        // List<Medicine> medicineStock = pharmacistService.getListMedicine();
+
+        model.addAttribute("startIndex", startIndex);
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", (total + pageSize - 1) / pageSize);
         model.addAttribute("pharmacist", pharmacist);
         model.addAttribute("medicineStock", medicineStock);
+        model.addAttribute("searchQuery", searchQuery);
         
         return "PharmacistDashboard";
     }
@@ -115,10 +138,33 @@ public class PharmacistController {
     }
 
     @GetMapping("/viewMedicineList")
-    public String viewMedicineList(Model model) {
+    public String viewMedicineList(Model model, @RequestParam(defaultValue = "0") int pageNo, 
+    @RequestParam(defaultValue = "5") int pageSize, @RequestParam(defaultValue = "") String searchQuery) {
         try {
-            List<Medicine> medicineList = pharmacistService.getListMedicine();
+            List<Medicine> allMedicine = pharmacistService.getListMedicine();
+
+            if (!searchQuery.isEmpty()) {
+                allMedicine = allMedicine.stream()
+                                 .filter(p -> p.getMedName().toLowerCase().contains(searchQuery.toLowerCase()) 
+                                           || p.getMedId().toString().contains(searchQuery))
+                                 .collect(Collectors.toList());
+            }
+
+            int total = allMedicine.size();
+            int start = Math.min(pageNo * pageSize, total);
+            int end = Math.min((pageNo + 1) * pageSize, total);
+            int startIndex = pageNo * pageSize;
+            // List<Medicine> medicineList = pharmacistService.getListMedicine();
+            
+            List<Medicine> medicineList = allMedicine.subList(start, end);
+
+
+            model.addAttribute("startIndex", startIndex);
+            model.addAttribute("currentPage", pageNo);
+            model.addAttribute("totalPages", (total + pageSize - 1) / pageSize);
             model.addAttribute("medicineList", medicineList);
+            model.addAttribute("searchQuery", searchQuery);
+
             return "viewMedicineList";
         } catch (Exception e) {
             e.printStackTrace();
