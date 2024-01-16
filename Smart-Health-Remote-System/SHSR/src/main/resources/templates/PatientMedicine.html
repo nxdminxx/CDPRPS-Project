@@ -100,16 +100,15 @@
                                             </thead>
                                             <tbody>
                                             <!-- Iterate over medicineList -->
-                                            <tr th:each="medicine, stat : ${medicineList}">
+                                            <tr th:each="medicine, stat : ${medicineList}" clas="product" id="product">
                                                 <td class="text-center" th:text="${stat.index + 1}"></td>
-                                                <td class="text-center" th:text="${medicine.medName}"></td>
-                                                <td class="text-center" th:text="${medicine.quantity}"></td>
+                                                <td class="text-center; medId" th:text="${medicine.medName}"></td>
+                                                <td class="text-center; newQuantity" th:text="${medicine.quantity}"></td>
                                                 <td class="text-center">
-                                                    <!-- Add Medicine Form -->
-                                                    <form th:action="@{/add-prescription/submit}" method="post"
-                                                          class="d-flex justify-content-center">
-                                                        <input type="hidden" name="patientId" th:value="${patientId}"/>
-                                                        <input type="hidden" name="addMed" th:value="${medicine.medName}"/>
+                                                    <!-- Add Medicine intp prescribe list -->
+                                                    <form th:action="@{/prescription/prescribeMedicine}" method="post" class="assignform" hidden="true"
+                                                    th:object="${medicine}">
+                                                    <input type="hidden" th:value="*{medId}" name="medId">                                                   <input type="hidden" name="addMed" th:value="${medicine.medName}"/>
                                                         <input type="number" name="quantity" min="1"
                                                                class="form-control form-input text-center"
                                                                id="medicationQuantity" autofocus="true"

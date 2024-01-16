@@ -46,12 +46,12 @@ public class SendPrescriptionController {
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
 
-        List<Medicine> medicineList = medicineService.getListMedicine(); //tukar utk dptkan stock medicine list
+        List<Medicine> prescribList = medicineService.getListPrescribe(patientId); //tukar utk dptkan stock medicine list
 
         model.addAttribute("patientName", patientService.getPatient(patientId).getName());
         model.addAttribute("patientId", patientId);
         model.addAttribute("doctor",doctor);
-        model.addAttribute("medicineList", medicineList);
+        model.addAttribute("prescribList", prescribList);
         System.out.println("patient id before"+patientId);
         return "sendPrescriptionForm";
     }
@@ -71,28 +71,50 @@ public class SendPrescriptionController {
         return "patientMedicine";
     }
 
-    @PostMapping("/add-prescription/submit")
-    public String submitMedicineForm(Model model,
-            @RequestParam String patientId,
-            @RequestParam String addMed,
-            @RequestParam int quantity) 
+    // @PostMapping("/add-prescription/submit")
+    // public String submitMedicineForm(Model model,
+    //         @RequestParam String patientId,
+    //         @RequestParam String addMed,
+    //         @RequestParam int quantity) 
+    //         throws ExecutionException, InterruptedException {
+    
+    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    //     MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
+    //     Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
+    
+    //     medicineService.prescribeMedicine(addMed, quantity, patientId);
+    
+    //     List<Medicine> prescribeList = medicineService.getListPrescribe(patientId);
+        
+    //     model.addAttribute("patientName", patientService.getPatient(patientId).getName());
+    //     model.addAttribute("patientId", patientId);
+    //     model.addAttribute("doctor", doctor);
+    //     model.addAttribute("prescribeList", prescribeList);
+        
+    //     // Redirect to the prescription form with the patientId parameter
+    //     return "redirect:/prescription/form?patientId=" + patientId;
+    // }
+
+     @PostMapping("/prescribeMedicine")
+    public String prescribeMedicine(Model model,
+            @RequestParam (value= "medId")String medId,
+            @RequestParam (value= "quantity")int quantity) 
             throws ExecutionException, InterruptedException {
     
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
+
+        Medicine medicine = medicineService.getMedicine(medId);
+        medicineService.prescribeMedicine(medId, quantity);
     
-        medicineService.prescribeMedicine(addMed, quantity, patientId);
-    
-        List<Medicine> prescribeList = medicineService.getListPrescribe(patientId);
+        List<Medicine> prescribeList = medicineService.getListPrescribe(medId);
         
-        model.addAttribute("patientName", patientService.getPatient(patientId).getName());
-        model.addAttribute("patientId", patientId);
         model.addAttribute("doctor", doctor);
         model.addAttribute("prescribeList", prescribeList);
         
         // Redirect to the prescription form with the patientId parameter
-        return "redirect:/prescription/form?patientId=" + patientId;
+        return "sendPrescriptionForm";
     }
 
     @PostMapping("/form/submit")

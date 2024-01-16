@@ -110,14 +110,14 @@
                                     <div class="mb-3 col-md-12">
                                         <h5>List of Prescribed Medicines</h5>
                                         <table border="1px" id="medTable">
-                                            <tr th:each="prescribedMedicine, stat : ${prescribeList}">
+                                            <tr th:each="medicine, stat : ${prescribList}">
                                                 <td>
                                                     <!-- Display prescribed medicine details -->
-                                                    <label th:text="${prescribedMedicine.medName}"></label><br>
+                                                    <label th:text="${medicine.medName}"></label><br>
                                                 </td>
                                                 <td>
                                                     <!-- Display quantity -->
-                                                    <p th:text="${prescribedMedicine.quantity}"></p>
+                                                    <p th:text="${medicine.quantity}"></p>
                                                 </td>                                    
                                             </tr>
                                         </table>

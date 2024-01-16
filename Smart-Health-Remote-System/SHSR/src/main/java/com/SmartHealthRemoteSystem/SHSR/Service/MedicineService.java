@@ -63,17 +63,15 @@ public class MedicineService {
         return MedicineRepository.getAll();
     }
 
-    public String prescribeMedicine(String medName, int quantity, String patientId) throws ExecutionException, InterruptedException {
-        Medicine newMedicine = new Medicine(medName, quantity);
-        newMedicine.setPatientId(patientId);  // Assuming Medicine class has a patientId field
-    
-        return MedicineRepository.save(newMedicine);
+    public void prescribeMedicine(String medId, int quantity) throws ExecutionException, InterruptedException {
+        Medicine newMedicine = MedicineRepository.get(medId);
+        newMedicine.setQuantity(quantity);
+
+        MedicineRepository.update(newMedicine);
     }
 
     public List<Medicine> getListPrescribe(String patientId) throws ExecutionException, InterruptedException {
-        List<Medicine> allMedicines = MedicineRepository.getAll();
-        return allMedicines.stream()
-                .filter(medicine -> patientId.equals(medicine.getPatientId())) // Assuming Medicine has getPatientId method
-                .collect(Collectors.toList());
+        List<Medicine> prescirbeMedicine = MedicineRepository.getAll();
+        return prescirbeMedicine;
     }
 }
