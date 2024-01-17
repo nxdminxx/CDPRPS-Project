@@ -107,7 +107,5 @@ public class MedicineRepository implements SHSRDAO<Medicine> {
         ApiFuture<WriteResult> writeResult = dbFirestore.collection(COL_NAME).document(MedId).delete();
         return "Document with medicine id " + MedId + " has been deleted";
     }
-
-    
 }
 

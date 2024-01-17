@@ -28,7 +28,8 @@
                         <a th:href="@{/pharmacist}" class="card-link"
                             style="text-decoration: none; color: black;">
                             <div class="card bg-primary bg-opacity-25 rounded">
-                                <img class="card-img-top" th:src="@{/image/profile3.jpg}" alt="Card image">
+                                <img class="card-img-top" th:src="@{/image/img_avatar1.png}" alt="Card image"> 
+                                <!-- <img class="card-img-top" th:src="@{'/pharmacist/profilePicture/' + ${pharmacist.userId}}" alt="Profile Picture"> -->
                                 <div class="card-body">
                                     <h3 class="card-title" th:text="${pharmacist.name}"> </h3>
                                     <p class="card-text" th:text="${pharmacist.position}"></p>
@@ -93,7 +94,11 @@
                         </tbody>
                     </table>
 
-                    <p>Last Updated: <span id="lastUpdated">[Insert Last Updated Timestamp Here]</span></p>
+                    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+                    <strong>Last Updated: </strong><span style="color:green" th:text="${successMessage}"></span>
+
+
+
                 </div>
             </div>
         </div>

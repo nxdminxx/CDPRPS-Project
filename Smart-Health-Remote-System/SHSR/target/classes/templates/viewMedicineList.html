@@ -24,7 +24,7 @@
                         <a th:href="@{/pharmacist}" class="card-link"
                             style="text-decoration: none; color: black;">
                             <div class="card bg-primary bg-opacity-25 rounded">
-                                <img class="card-img-top" th:src="@{/image/profile3.jpg}" alt="Card image">
+                                <img class="card-img-top" th:src="@{/image/img_avatar1.png}" alt="Card image">
                                 <div class="card-body">
                                     <h3 class="card-title">Syazwani </h3>
                                     <p class="card-text">Head Officer</p>
@@ -68,13 +68,16 @@
                         </button>
                     </div>
 
-                    <div th:if="${lastUpdatedMessage != null}" class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong th:text="${lastUpdatedMessage}"></strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div th:if="${lastUpdated}" class="last-updated">
+                        <strong>Last Updated: </strong><span style="color:blue" th:text="${lastUpdated}"></span>
                     </div>
-                    <div th:if="${errorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+
+                    <div th:if="${successMessage}" class="alert alert-success">
+                        <strong th:text="${successMessage}"></strong>
+                    </div>
+
+                    <div th:if="${errorMessage}" class="alert alert-danger">
                         <strong th:text="${errorMessage}"></strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
 
                     <table class="table table-striped" border="1">
@@ -92,10 +95,14 @@
                                 <td class="text-center" th:text="${medicine.medName}"></td>
                                 <td class="text-center" th:text="${medicine.quantity}"></td>
                                 <td class="text-center">
-                                    <a th:href="@{'/pharmacist/editMedicine/' + ${medicine.medId}}" class="btn btn-primary btn-edit-medicine">
-                                        Edit
-                                    </a>
-                                    <a th:if="${medicine != null}" th:href="@{'/pharmacist/deleteMedicine/' + ${medicine.medId}}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this medicine?')">Delete</a>
+                                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                        <a th:href="@{'/pharmacist/editMedicine/' + ${medicine.medId}}" class="btn btn-primary me-2">
+                                            Edit
+                                        </a>
+                                        <form th:action="@{'/pharmacist/deleteMedicine/' + ${medicine.medId}}" method="post" style="display: inline-block;">
+                                            <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this medicine?')">
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -144,35 +151,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Edit Medicine Modals 
-    <div th:each="medicine : ${medicineList}">
-        <div class="modal fade" th:id="'editMedicineModal' + ${medicine.medId}" tabindex="-1" role="dialog"
-            th:aria-labelledby="'editMedicineModalLabel' + ${medicine.medId}" th:aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" th:id="'editMedicineModalLabel' + ${medicine.medId}">Edit Medicine</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editMedicineForm" th:action="@{/pharmacist/updateMedicine}" method="post">
-                            <input type="hidden" id="editMedicineId" name="medId" th:value="${medicine.medId}" />
-                            <div class="mb-3">
-                                <label for="editMedicineName" class="form-label">Medicine Name</label>
-                                <input type="text" class="form-control" id="editMedicineName" name="medName" th:value="${medicine.medName}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editMedicineQuantity" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" id="editMedicineQuantity" name="quantity" th:value="${medicine.quantity}" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Update Medicine</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> 
-    </div> -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 

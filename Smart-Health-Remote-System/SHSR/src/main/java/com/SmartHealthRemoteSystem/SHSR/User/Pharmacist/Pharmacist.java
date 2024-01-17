@@ -7,7 +7,7 @@ public class Pharmacist extends User {
     private String pharmacistHospital;
     private String pharmacistPosition;
     // image
-    private String profilePicture;
+    private byte[] profilePicture;
 
     public Pharmacist(){
     }
@@ -41,11 +41,11 @@ public class Pharmacist extends User {
     }
     
     //image
-    public String getProfilePicture() {
+    public byte[] getProfilePicture() {
         return profilePicture;
     }
-
-    public void setProfilePicture(String profilePicture) {
+    
+    public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
     }
 }

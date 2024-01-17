@@ -28,31 +28,42 @@
 
                 <div class="col">
                     <div class="d-flex shadow flex-column flex-shrink-0 p-3 bg-primary bg-opacity-25 rounded">
-                        <a th:href="@{/doctor}" class="card-link"
-                        style="text-decoration: none; color: black;">
+                        <a th:href="@{/doctor}" class="card-link" style="text-decoration: none; color: black;">
                             <div class="card bg-primary bg-opacity-25 rounded">
-                                <img class="card-img-top" src="/image/img_avatar1.png" alt="Card image">
-                                    <div class="card-body">
-                                        <h3 class="card-title" th:text="${doctor.name}"></h3>
-                                        <p class="card-text" th:text="${doctor.position}"></p>
-                                    </div>
+                                <img class="card-img-top" th:src="@{/image/img_avatar1.png}" alt="Card image">
+                                <div class="card-body">
+                                    <h3 class="card-title" th:text="${doctor.name}" > </h3>
+                                    <p class="card-text" th:text="${doctor.position}"></p>
+                                </div>
                             </div>
                         </a>
                         <hr>
                         <ul class="nav nav-pills flex-column mb-auto">
                             <li class="nav-item">
-                                <a th:href="@{/doctor/myPatient}" class="nav-link link-dark active f">
+                                <a th:href="@{/doctor/updateProfile}" class="nav-link link-dark f">
+                                    Edit Profile
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/doctor/myPatient(pageNo=1)}" class="nav-link link-dark f">
                                     My Patient
                                 </a>
                             </li>
                             <li>
-                                <a th:href="@{/assignpatient}" class="nav-link link-dark f">
+                                <a th:href="@{/assignpatient}" class="nav-link link-dark active f">
                                     Assign Patient
                                 </a>
                             </li>
+                            <!---izzat-->
                             <li>
-                                <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
-                                    <input type="submit" value="Logout" />
+                                <a th:href="@{/patient/list}"class="nav-link link-dark f">
+                                    List of Assigned Patient
+                                </a>
+                            </li>
+                            <!---izzat-->
+                            <li>
+                                <form th:action="@{/logout}" method="post" hidden="true" name="logoutForm">
+                                    <input type="submit" value="Logout"/>
                                 </form>
                                 <a href="javascript: document.logoutForm.submit()" class="nav-link link-dark f">
                                     Logout
@@ -85,9 +96,9 @@
                             <div class="mb-3 col-md-12">
                                 <div class="signup-form">
                                     <!-- Prescription form -->
-                                    <form th:action="@{/add-prescription/submit}" id="prescriptionForm"
-                                          class="border p-4 bg-light shadow" method="post">
-    
+                                    <form th:action="@{/prescribemedicine/submit}" id="prescriptionForm"
+                                        class="border p-4 bg-light shadow" method="get">
+
                                         <!-- Medication table -->
                                         <table class="table table-striped" border="1">
                                             <thead>
@@ -95,36 +106,33 @@
                                                 <th class="text-center" scope="col">No</th>
                                                 <th class="text-center" scope="col">Medicine Name</th>
                                                 <th class="text-center" scope="col">Stock Available</th>
-                                                <th class="text-center" scope="col">Add Medicine</th>
+                                                <th class="text-center" scope="col">Quantity</th>
+                                                <th class="text-center" scope="col">Select</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <!-- Iterate over medicineList -->
-                                            <tr th:each="medicine, stat : ${medicineList}" clas="product" id="product">
+                                            <tr th:each="medicine, stat : ${medicineList}">
                                                 <td class="text-center" th:text="${stat.index + 1}"></td>
-                                                <td class="text-center; medId" th:text="${medicine.medName}"></td>
-                                                <td class="text-center; newQuantity" th:text="${medicine.quantity}"></td>
+                                                <td class="text-center" th:text="${medicine.medName}"></td>
+                                                <td class="text-center" th:text="${medicine.quantity}"></td>
                                                 <td class="text-center">
-                                                    <!-- Add Medicine intp prescribe list -->
-                                                    <form th:action="@{/prescription/prescribeMedicine}" method="post" class="assignform" hidden="true"
-                                                    th:object="${medicine}">
-                                                    <input type="hidden" th:value="*{medId}" name="medId">                                                   <input type="hidden" name="addMed" th:value="${medicine.medName}"/>
-                                                        <input type="number" name="quantity" min="1"
-                                                               class="form-control form-input text-center"
-                                                               id="medicationQuantity" autofocus="true"
-                                                               style="resize: none;width: 200px;">
-                                                        <button type="submit" id="theButtonAddMed"
-                                                                class="btn btn-primary submitBtn ms-2">Add
-                                                        </button>
-                                                    </form>
+                                                    <!-- Quantity Input Form -->
+                                                    <input type="number" name="quantity_${medicine.medName}" min="1"
+                                                        class="form-control form-input text-center"
+                                                        id="medicationQuantity_${stat.index}" style="resize: none;width: 100px;">
+                                                </td>
+                                                <td class="text-center">
+                                                    <!-- Add Checkbox -->
+                                                    <input type="checkbox" name="selectedMedicines" th:value="${medicine.medName}" />
                                                 </td>
                                             </tr>
                                             </tbody>
                                         </table>
-    
+
                                         <!-- Submit button -->
                                         <div class="d-flex justify-content-end">
-                                            <button type="button" class="btn btn-primary float-end col-md-2 submitBtn">
+                                            <button type="submit" class="btn btn-primary float-end col-md-2 submitBtn">
                                                 Submit
                                             </button>
                                         </div>

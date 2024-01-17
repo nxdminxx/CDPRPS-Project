@@ -63,11 +63,16 @@ public class MedicineService {
         return MedicineRepository.getAll();
     }
 
-    public void prescribeMedicine(String medId, int quantity) throws ExecutionException, InterruptedException {
-        Medicine newMedicine = MedicineRepository.get(medId);
-        newMedicine.setQuantity(quantity);
-
-        MedicineRepository.update(newMedicine);
+    public void prescribeMedicine(String patientId, String medId, int quantity) throws ExecutionException, InterruptedException {
+        // Retrieve the medicine using its ID
+        Medicine medicine = MedicineRepository.get(medId);
+        
+        // Update the medicine quantity (based on your business logic; you might need to decrease stock)
+        int newQuantity = medicine.getQuantity() - quantity;
+        medicine.setQuantity(newQuantity);
+        
+        // Persist the updated medicine quantity
+        MedicineRepository.update(medicine);
     }
 
     public List<Medicine> getListPrescribe(String patientId) throws ExecutionException, InterruptedException {
