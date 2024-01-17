@@ -23,13 +23,15 @@
         <div class="row gx-5">
             <div class="col ">
                 <div class="d-flex shadow flex-column flex-shrink-0 p-3 bg-primary bg-opacity-25 rounded">
-                    <div class="card bg-primary bg-opacity-25 rounded">
-                        <img class="card-img-top" th:src="'data:image/png;base64,' + ${doctor.profilePicture}" alt="Card image" >
-                        <div class="card-body">
-                            <h3 class="card-title" th:text="${doctor.name}"></h3>
-                            <p class="card-text" th:text="${doctor.position}"></p>
+                    <a th:href="@{/doctor}" class="card-link" style="text-decoration: none; color: black;">
+                        <div class="card bg-primary bg-opacity-25 rounded">
+                            <img class="card-img-top" th:src="@{/image/img_avatar1.png}" alt="Card image">
+                            <div class="card-body">
+                                <h3 class="card-title" th:text="${doctor.name}" > </h3>
+                                <p class="card-text" th:text="${doctor.position}"></p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                     <hr>
                     <ul class="nav nav-pills flex-column mb-auto">
                         <li class="nav-item">

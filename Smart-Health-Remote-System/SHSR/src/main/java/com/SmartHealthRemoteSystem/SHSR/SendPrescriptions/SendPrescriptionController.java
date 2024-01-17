@@ -58,13 +58,13 @@ public class SendPrescriptionController {
         return "sendPrescriptionForm";
     }
 
-    @GetMapping("/prescribeMedicine")
+    @GetMapping("/add-prescription")
     public String addMedication(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
 
-        List<Medicine> medicineList = medicineService.getListMedicine();
+        List<Medicine> medicineList = medicineService.getListMedicine(); //new method for patientMedicine
     
         model.addAttribute("patientName", patientService.getPatient(patientId).getName());
         model.addAttribute("patientId", patientId);
@@ -73,7 +73,22 @@ public class SendPrescriptionController {
         return "patientMedicine";
     }
 
-    @PostMapping("/prescribeMedicine/submit")
+    // @GetMapping("/prescribeMedicine")
+    // public String addMedication(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
+    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    //     MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
+    //     Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
+
+    //     List<Medicine> medicineList = medicineService.getListMedicine();
+    
+    //     model.addAttribute("patientName", patientService.getPatient(patientId).getName());
+    //     model.addAttribute("patientId", patientId);
+    //     model.addAttribute("doctor",doctor);
+    //     model.addAttribute("medicineList", medicineList);
+    //     return "patientMedicine";
+    // }
+
+    @PostMapping("/prescribemedicine/submit")
     public String prescribeMedicine(Model model,
         @RequestParam Map<String, String> allParams,
         @RequestParam (value= "selectedMedicines") List<String> selectedMedicines,
@@ -87,17 +102,20 @@ public class SendPrescriptionController {
         List<PrescribeMedicine> prescribedMedicines = new ArrayList<>();
 
         for (String medName : selectedMedicines) {
-            String quantityParam = "quantity_" + medName;
-            int quantity = Integer.parseInt(allParams.get(quantityParam));
+            String quantityParam = "quantity_" + medName.replace(" ", "_"); // Ensure that the parameter name is consistent with the input name attribute
+            String quantityStr = allParams.get(quantityParam);
+            if (quantityStr != null && !quantityStr.isEmpty()) {
+                int quantity = Integer.parseInt(quantityStr);
 
-            // Prescribe medicine and deduct stock
-            medicineService.prescribeMedicine(patientId, medName, quantity);
+                // Prescribe medicine and deduct stock
+                medicineService.prescribeMedicine(patientId, medName, quantity);
 
-            // Add the prescribed medicine to a new prescription
-            prescriptionService.addMedicineToNewPrescription(patientId, doctor.getUserId(), medName, quantity);
+                // Add the prescribed medicine to a new prescription
+                prescriptionService.addMedicineToNewPrescription(patientId, doctor.getUserId(), medName, quantity);
 
-            // Add to local list to be displayed later
-            prescribedMedicines.add(new PrescribeMedicine(medName, patientId, quantity));
+                // Add to local list to be displayed later
+                prescribedMedicines.add(new PrescribeMedicine(medName, patientId, quantity));
+            }
         }
 
         model.addAttribute("patientId", patientId);
