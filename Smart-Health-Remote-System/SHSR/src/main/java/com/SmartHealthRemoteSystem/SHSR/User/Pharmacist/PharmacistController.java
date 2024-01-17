@@ -22,6 +22,9 @@ import com.google.cloud.firestore.Query.Direction;
 import com.google.firebase.cloud.FirestoreClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -86,33 +89,30 @@ public class PharmacistController {
     }
 
     @PostMapping("/updateProfile/profile")
-        public String submitProfile(@ModelAttribute Pharmacist pharmacist, @RequestParam("profilePicture") MultipartFile profilePicture) throws ExecutionException, InterruptedException, IOException {
+    public String submitProfile(@ModelAttribute Pharmacist pharmacist, @RequestParam("profilePicture") MultipartFile profilePicture) throws ExecutionException, InterruptedException, IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
         pharmacist.setUserId(myUserDetails.getUsername());
-
+    
         if (!profilePicture.isEmpty()) {
-        
             byte[] profilePictureBytes = profilePicture.getBytes();
-            String base64EncodedProfilePicture = Base64.getEncoder().encodeToString(profilePictureBytes);
-            pharmacist.setProfilePicture(base64EncodedProfilePicture);
+            pharmacist.setProfilePicture(profilePictureBytes); // Store image as byte array in the entity
         }
-
+    
         pharmacistService.updatePharmacist(pharmacist);
         return "redirect:/pharmacist/updateProfile";
-    }   
+    }  
 
     @GetMapping("/pharmacist/profilePicture/{userId}")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> getProfilePicture(@PathVariable String userId) {
-       // Retrieve the profile picture data (base64-encoded string)
-        // You might want to replace this with your actual logic to get the profile picture data
-        String profilePictureData = "base64-encoded-image-data"; 
+    public ResponseEntity<byte[]> getProfilePicture(@PathVariable String userId) throws ExecutionException, InterruptedException {
+        // Retrieve the profile picture data from the database based on the user ID
+        byte[] profilePictureData = pharmacistService.getProfilePictureData(userId);
 
-        Map<String, String> responseData = new HashMap<>();
-        responseData.put("profilePicture", profilePictureData);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG); // Adjust content type based on your image format
 
-    return ResponseEntity.ok(responseData);
+        return new ResponseEntity<>(profilePictureData, headers, HttpStatus.OK);
     }
 
     @GetMapping("/viewMedicineList")
@@ -120,10 +120,18 @@ public class PharmacistController {
         try {
             List<Medicine> medicineList = pharmacistService.getListMedicine();
             model.addAttribute("medicineList", medicineList);
+    
+            // Format the current timestamp and add it to the model
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM dd yyyy HH:mm:ss");
+            String formattedTimestamp = now.format(formatter);
+            model.addAttribute("lastUpdated", formattedTimestamp);
+    
             return "viewMedicineList";
         } catch (Exception e) {
             e.printStackTrace();
-            return "error";
+            model.addAttribute("errorMessage", "Error retrieving medicines.");
+            return "viewMedicineList";
         }
     }
 
@@ -166,41 +174,28 @@ public class PharmacistController {
         }
     }
 
-    @DeleteMapping("/deleteMedicine/{medId}")
-    public String deleteSelectedMedicine(@PathVariable("medIdToBeDelete") String medId, Model model) {
+    @PostMapping("/deleteMedicine/{medId}")
+    public String deleteSelectedMedicine(@PathVariable("medId") String medId, RedirectAttributes redirectAttributes) {
         try {
-            // Call your service method to delete the medicine based on medId
             String deleteMessage = medicineService.deleteMedicine(medId);
     
+            // Format the current timestamp
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM dd yyyy HH:mm:ss");
+            String formattedTimestamp = now.format(formatter);
+            redirectAttributes.addFlashAttribute("lastUpdated", formattedTimestamp);
+    
             if (deleteMessage.startsWith("Error")) {
-                // If deletion was unsuccessful, add an error message to the model
-                model.addAttribute("errorMessage", deleteMessage);
+                redirectAttributes.addFlashAttribute("errorMessage", deleteMessage);
             } else {
-                // If deletion was successful, add a success message to the model
-                model.addAttribute("successMessage", deleteMessage);
+                redirectAttributes.addFlashAttribute("successMessage", deleteMessage);
             }
     
-            // Update the model with the appropriate lists
-            List<Medicine> medicineList = medicineService.getMedicineList();
-            model.addAttribute("medicineList", medicineList);
-    
-            // Debug statement to log the deletion message to the console
-            System.out.println("Medicine Deletion Message: " + deleteMessage);
-    
-            return "viewMedicineList";  // Assuming this is the view for displaying medicine list
+            return "redirect:/pharmacist/viewMedicineList";
         } catch (Exception e) {
-            // Log the exception for future reference
             e.printStackTrace();
-    
-            // Add the error message to the model
-            String errorMessage = "Error deleting medicine. Please check the logs for more information.";
-            model.addAttribute("errorMessage", errorMessage);
-    
-            // Debug statement to log the exception to the console
-            System.out.println("Exception while deleting medicine: " + e.getMessage());
-    
-            // Return to the medicine list view with the error message
-            return "viewMedicineList";  // Assuming this is the view for displaying medicine list
+            redirectAttributes.addFlashAttribute("errorMessage", "Error deleting medicine.");
+            return "redirect:/pharmacist/viewMedicineList";
         }
     }
 
@@ -211,12 +206,14 @@ public class PharmacistController {
             if (medicine != null) {
                 medicine.setQuantity(medicine.getQuantity() + quantity);
                 medicineService.updateMedicine(medicine);
-                
-                Date now = new Date();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd yyyy HH:mm:ss");
-                String formattedTimestamp = dateFormat.format(now);
-                String successMessage = "Stock added successfully at " + formattedTimestamp;
     
+                // Format the current timestamp
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM dd yyyy HH:mm:ss");
+                String formattedTimestamp = now.format(formatter);
+                redirectAttributes.addFlashAttribute("lastUpdated", formattedTimestamp);
+    
+                String successMessage = "Stock added successfully at " + formattedTimestamp;
                 redirectAttributes.addFlashAttribute("successMessage", successMessage);
             }
             return "redirect:/pharmacist";
@@ -229,6 +226,12 @@ public class PharmacistController {
 
     @GetMapping("/addMedicineForm")
     public String showAddMedicineForm(Model model) {
+
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM dd yyyy HH:mm:ss");
+        String formattedTimestamp = now.format(formatter);
+
+        model.addAttribute("lastUpdated", formattedTimestamp);
         model.addAttribute("newMedicine", new Medicine());
         return "addMedicineForm";
     }
@@ -250,18 +253,18 @@ public class PharmacistController {
             // Call the service method to add the new medicine
             medicineService.createMedicine(newMedicine);
     
-            // Get current timestamp for last update
-            Date timestamp = new Date();
-    
-            // Format the timestamp
+            // Format the current timestamp
             SimpleDateFormat dateFormat = new SimpleDateFormat("MM dd yyyy HH:mm:ss");
-            String formattedTimestamp = dateFormat.format(timestamp);
+            String formattedTimestamp = dateFormat.format(new Date());
     
             // Set timestamp as message too
             String message = "Medicine added successfully at " + formattedTimestamp;
     
-            // Use RedirectAttributes to add flash attribute
+            // Add the new medicine to the end of the list
+            existingMedicines.add(newMedicine);
+    
             redirectAttributes.addFlashAttribute("successMessage", message);
+            redirectAttributes.addFlashAttribute("lastUpdated", formattedTimestamp);
     
             return "redirect:/pharmacist/viewMedicineList";
         } catch (Exception e) {

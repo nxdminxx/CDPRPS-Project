@@ -40,18 +40,30 @@
                         <hr>
                         <ul class="nav nav-pills flex-column mb-auto">
                             <li class="nav-item">
-                                <a th:href="@{/doctor/myPatient}" class="nav-link link-dark active f">
+                                <a th:href="@{/doctor/updateProfile}" class="nav-link link-dark f">
+                                    Edit Profile
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/doctor/myPatient(pageNo=1)}" class="nav-link link-dark f">
                                     My Patient
                                 </a>
                             </li>
                             <li>
-                                <a th:href="@{/assignpatient}" class="nav-link link-dark f">
+                                <a th:href="@{/assignpatient}" class="nav-link link-dark active f">
                                     Assign Patient
                                 </a>
                             </li>
+                            <!---izzat-->
                             <li>
-                                <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
-                                    <input type="submit" value="Logout" />
+                                <a th:href="@{/patient/list}"class="nav-link link-dark f">
+                                    List of Assigned Patient
+                                </a>
+                            </li>
+                            <!---izzat-->
+                            <li>
+                                <form th:action="@{/logout}" method="post" hidden="true" name="logoutForm">
+                                    <input type="submit" value="Logout"/>
                                 </form>
                                 <a href="javascript: document.logoutForm.submit()" class="nav-link link-dark f">
                                     Logout
@@ -85,7 +97,7 @@
                                 <div class="signup-form">
                                     <!-- Prescription form -->
                                     <form th:action="@{/prescribemedicine/submit}" id="prescriptionForm"
-                                        class="border p-4 bg-light shadow" method="post">
+                                        class="border p-4 bg-light shadow" method="get">
 
                                         <!-- Medication table -->
                                         <table class="table table-striped" border="1">

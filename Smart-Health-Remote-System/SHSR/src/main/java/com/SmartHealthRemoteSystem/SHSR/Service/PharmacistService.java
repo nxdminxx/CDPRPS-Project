@@ -162,4 +162,12 @@ public class PharmacistService {
         // Call the service method to add the new medicine to the database
         return medicineRepository.save(newMedicine);
     }
+
+    public byte[] getProfilePictureData(String userId) throws ExecutionException, InterruptedException {
+        Pharmacist pharmacist = pharmacistRepository.get(userId);
+        if (pharmacist != null) {
+            return pharmacist.getProfilePicture();
+        }
+        return null; // Or handle the case when no profile picture is found
+    }
 }

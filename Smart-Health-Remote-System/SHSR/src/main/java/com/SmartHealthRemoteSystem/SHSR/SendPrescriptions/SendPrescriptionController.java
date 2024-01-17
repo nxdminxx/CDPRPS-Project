@@ -123,7 +123,7 @@ public class SendPrescriptionController {
         model.addAttribute("prescribedMedicines", prescribedMedicines);
 
         // Redirect to the page that displays the prescribed medicines list
-        return "redirect:/prescription/sendPrescriptionForm";
+        return "PatientMedicine";
     }
 
     @PostMapping("/form/submit")
