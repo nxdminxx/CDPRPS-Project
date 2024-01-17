@@ -39,7 +39,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a th:href="@{/pharmacist/viewMedicineList}" class="nav-link link-dark f">
+                                <a th:href="@{/pharmacist/viewMedicineList(pageNo=0)}" class="nav-link link-dark f">
                                     Medicine List
                                 </a>
                             </li>
@@ -80,6 +80,14 @@
                         <strong th:text="${errorMessage}"></strong>
                     </div>
 
+                  <!--Search-->
+                    <form th:action="@{/pharmacist/viewMedicineList}" method="get">
+                        <input type="text" name="searchQuery" placeholder="Enter keyword to search" th:value="${searchQuery}" style="width: 50%">
+                        <input type="hidden" name="pageNo" th:value="${currentPage}">
+                        <input type="hidden" name="pageSize" th:value="${pageSize}">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+
                     <table class="table table-striped" border="1">
                         <thead>
                             <tr>
@@ -91,7 +99,7 @@
                         </thead>
                         <tbody>
                             <tr th:each="medicine, stat : ${medicineList}">
-                                <td class="text-center" th:text="${stat.index + 1}"></td>
+                                <td class="text-center" th:text="${startIndex + stat.index + 1}"></td>
                                 <td class="text-center" th:text="${medicine.medName}"></td>
                                 <td class="text-center" th:text="${medicine.quantity}"></td>
                                 <td class="text-center">
@@ -121,7 +129,21 @@
                             </div>
                         </div>
 
-                    </table>                  
+                    </table>    
+                    <!-- Pagination Controls -->
+                    <nav aria-label="Patient navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/pharmacist/viewMedicineList(pageNo=${currentPage - 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''">
+                                <a class="page-link" th:href="@{/pharmacist/viewMedicineList(pageNo=${i}, pageSize=${pageSize}, searchQuery=${searchQuery})}" th:text="${i + 1}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                                <a class="page-link" th:href="@{/pharmacist/viewMedicineList(pageNo=${currentPage + 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>              
                 </div>
             </div>
         </div>
@@ -152,7 +174,42 @@
         </div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <!-- Edit Medicine Modals 
+    <div th:each="medicine : ${medicineList}">
+        <div class="modal fade" th:id="'editMedicineModal' + ${medicine.medId}" tabindex="-1" role="dialog"
+            th:aria-labelledby="'editMedicineModalLabel' + ${medicine.medId}" th:aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" th:id="'editMedicineModalLabel' + ${medicine.medId}">Edit Medicine</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editMedicineForm" th:action="@{/pharmacist/updateMedicine}" method="post">
+                            <input type="hidden" id="editMedicineId" name="medId" th:value="${medicine.medId}" />
+                            <div class="mb-3">
+                                <label for="editMedicineName" class="form-label">Medicine Name</label>
+                                <input type="text" class="form-control" id="editMedicineName" name="medName" th:value="${medicine.medName}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMedicineQuantity" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="editMedicineQuantity" name="quantity" th:value="${medicine.quantity}" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Medicine</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div> -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
+
+const searchInput = document.getElementById('search-input');
+    searchInput.addEventListener('input', () => {
+        // ... JavaScript code for client-side filtering ...
+    });
+</script>
 
 </body>
 </html>
