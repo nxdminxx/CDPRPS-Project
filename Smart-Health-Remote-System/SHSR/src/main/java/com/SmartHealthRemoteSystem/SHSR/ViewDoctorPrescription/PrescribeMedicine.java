@@ -1,17 +1,24 @@
 package com.SmartHealthRemoteSystem.SHSR.ViewDoctorPrescription;
 
+import com.SmartHealthRemoteSystem.SHSR.Medicine.Medicine;
+
 public class PrescribeMedicine {
     
     private String medName;
-    private int quantity;
+    private String patientId;
     private int prescribedQuantity;
 
     public PrescribeMedicine() {
     }
 
-    public PrescribeMedicine(String medName, int quantity, int prescribedQuantity) {
+    public PrescribeMedicine(String medName, String patientId, int prescribedQuantity) {
         this.medName = medName;
-        this.quantity = quantity;
+        this.patientId = patientId;
+        this.prescribedQuantity = prescribedQuantity;
+    }
+
+    public PrescribeMedicine(String medName, int prescribedQuantity) {
+        this.medName = medName;
         this.prescribedQuantity = prescribedQuantity;
     }
 
@@ -23,12 +30,12 @@ public class PrescribeMedicine {
         this.medName = medName;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public String getPatientId() {
+        return patientId;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
 
     public int getPrescribedQuantity() {

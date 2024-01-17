@@ -23,135 +23,190 @@
     </style>
 </head>
 <body>
-
-
-<div id="main">
-
-    <div class="container shadow p-3 mb-5  bg-primary bg-opacity-25 rounded"
-     style="position: relative; top: 50px; width: 60%;">
-    <div class="container overflow-hidden">
-
-
-            <div list-group-item class="m-3 d-flex justify-content-left align-items-center " >
-                <a class="btn btn-secondary confirmBtn" th:href="@{/doctor/myPatient(pageNo=0)}">Back</a>
+    <div class="container shadow p-3 mb-5  bg-primary bg-opacity-25 rounded" style="position: relative; top: 50px;">
+        <div class="container overflow-hidden">
+            <div class="row gx-5">
+                <div class="col ">
+                    <div class="d-flex shadow flex-column flex-shrink-0 p-3 bg-primary bg-opacity-25 rounded">
+                        <a th:href="@{/patient}" class="card-link" style="text-decoration: none; color: black;">
+                            <div class="card bg-primary bg-opacity-25 rounded">
+                                <img class="card-img-top" src="/image/img_avatar1.png" alt="Card image" >
+                                <div class="card-body">
+                                    <h3 class="card-title">rakesh</h3>
+                                    <p style=" font-size: 12px;">Patient Contact No. :<span>012345690</span></p>
+                                    <p style=" font-size: 12px;">Patient Address : <span>aaabbb</span></p>
+                                    <p style=" font-size: 12px;">Emergency Contact No. : <span>sheesh</span></p>
+                                </div>
+                            </div>
+                        </a>
+                        <hr>
+                        <ul class="nav nav-pills flex-column mb-auto">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" aria-current="page">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <!-- <form th:action="@{/viewPatientHealthStatus/b(patientId=${patient.userId},doctorId=${doctor.userId})}" method="post" name="viewPatient" class="viewPatientForm">
+                                    <input type="text" th:value="${doctor.userId}" th:name="doctorId" id="doctorId"  hidden="hidden">
+                                    <input type="text" th:value="${patient.userId}" th:name="patientId" id="patientId" hidden="hidden"> -->
+                                    <a role="button" class="nav-link link-dark f">View</a> 
+                                <!-- </form> -->
+    
+                            </li>
+                            <li>
+                                <a class="nav-link link-dark f" name="editProfile">
+                                    Edit Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a  class="nav-link link-dark f" name="HealthCondition">Health Condition</a>
+                                    
+                                </a>
+                            </li>
+                            <li>
+                                <form th:action="@{/logout}" method="post" hidden="true" name="logoutForm">
+                                    <button>Logout</button>
+                                </form>
+                                <a href="javascript: document.logoutForm.submit()" class="nav-link link-dark f">
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+    
+                    </div>
+                </div>
+                <div class="col-9">
+    
+                                <div list-group-item class="m-3 d-flex justify-content-left align-items-center">
+                                    <!-- Check if the user type is doctor -->
+                                    <th:block th:if="${userType == 'doctor'}">
+                                        <a class="btn btn-secondary confirmBtn" th:href="@{/doctor/myPatient(pageNo=1)}">Back</a>
+                                    </th:block>
+                                
+                                    <!-- Check if the user type is patient -->
+                                    <th:block th:if="${userType == 'patient'}">
+                                        <a class="btn btn-secondary confirmBtn" th:href="@{/patient/backDashboard}">Back</a>
+                                    </th:block>
+                                </div>
+                        
+                        
+                                <h1 class="d-flex justify-content-start"> Health Condition</h1>
+                                Patient ID: <p th:text="${patientid}"></p>
+                                Patient Sensor ID: 
+                                
+                                <div th:if="${sensorDataList}">
+                                    <p th:text="${sensorDataList.sensorDataId}"></p>
+                                </div>
+                                
+                                <div th:unless="${sensorDataList}">
+                                    <p>None</p>          
+                                </div>
+                        
+                                    <table class = "table-bordered">
+                                        <tr>
+                                            <td>Normal</td>
+                                            <td><div style="width: 20px; height: 20px; background-color: rgb(130, 255, 130);"></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Not normal</td>
+                                            <td><div style="width: 20px; height: 20px; background-color: rgb(255, 90, 90);"></div></td>
+                                        </tr>
+                                    </table><br>
+    
+                                        Current/Latest Data
+                                        <table class="table table-bordered border border-dark">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">Body Temperature(Celsius)</th>
+                                                <th scope="col">Oxygen Saturation(SpO2)%</th>
+                                                <th scope="col">ECG</th>
+                                                <th scope="col">Heart Rate</th>
+                                                <th scope="col">Date & Time</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="tbody">
+                                            <tr th:each="sensorData:${sensorDataList}">
+                                                <td id="exist" th:style="${sensorData.bodyTemperature} > 37.2 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'" >
+                                                    [[${sensorData.bodyTemperature}]]</td>
+                                                <td th:style="${sensorData.oxygenReading} < 94 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'" >
+                                                    [[${sensorData.oxygenReading}]]</td>
+                                                <td th:text="${sensorData.ecgReading}">-</td>
+                                                <td th:style="${sensorData.Heart_Rate} > 90 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'" >
+                                                    [[${sensorData.Heart_Rate}]]</td>
+                                                <td th:text="${#dates.format(sensorData.timestamp, 'dd MMM yyyy HH:mm')}">-</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                        
+                                        <table th:if="${sensorDataListHistory}" class="table table-bordered border border-dark table-container">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col">Body Temperature(Celsius)</th>
+                                                <th scope="col">Oxygen Saturation(SpO2)%</th>
+                                                <th scope="col">ECG</th>
+                                                <th scope="col">Heart Rate</th>
+                                                <th scope="col">Date & Time</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="tbody">
+                                            <tr th:each="sensorData:${sensorDataListHistory}">
+                                                <td id="exist" th:style="${sensorData.bodyTemperature} > 37.2 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'">
+                                                    [[${sensorData.bodyTemperature}]]
+                                                </td>
+                                                <td th:style="${sensorData.oxygenReading} < 94 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'">
+                                                    [[${sensorData.oxygenReading}]]
+                                                </td>
+                                                <td th:text="${sensorData.ecgReading}">-</td>
+                                                <td th:style="${sensorData.Heart_Rate} > 90 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'">
+                                                    [[${sensorData.Heart_Rate}]]
+                                                </td>
+                                                <td th:text="${#dates.format(sensorData.timestamp, 'dd MMM yyyy HH:mm')}">-</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+    
+                                        <!-- will display when sensor data is NULL -->
+                                        <div th:style="${sensorDataList != null} ? 'display: none'" >
+                                            <h2>There is no Sensor ID Attach to this Patient.</h2>
+                                            <button class= "btn btn-warning" th:onclick="'showModal()'">Create</button>
+                                        </div>
+    
+                                        <!-- will display when sensor data is Exist -->
+                                        <!-- <div th:style="${sensorDataList == null} ? 'display: none'" >
+                                        
+                                        <form method="post" th:action="@{/patient/savehistory}">
+                        
+                                            <input type="hidden" th:name="patientid" th:value="${patientid}"/>
+                                            <button class= "submit btn btn-warning">Save to History</button>
+                                        
+                                        </form>
+                                            </div> -->
+                        
+                                    <div>
+                                        <!-- Chart container -->
+                                        <div style="width: 80%; margin: auto;">
+                                            <canvas id="bodyTemperatureChart"></canvas>
+                                        </div>
+    
+                                        <div style="width: 80%; margin: auto;">
+                                            <canvas id="oxygenSaturationChart"></canvas>
+                                        </div>
+    
+                                        <div style="width: 80%; margin: auto;">
+                                            <canvas id="ecgChart"></canvas>
+                                        </div>
+    
+                                        <div style="width: 80%; margin: auto;">
+                                            <canvas id="heartRateChart"></canvas>
+                                        </div>
+                                    </div>
+                </div>          
             </div>
-
-
-            <h1 class="d-flex justify-content-start"> Health Condition</h1>
-            Patient ID: <p th:text="${patientid}"></p>
-            Patient Sensor ID: 
-            <div th:if="${sensorDataList}">
-              <p th:text="${sensorDataList.sensorDataId}"></p>
-          </div>
-          
-          <div th:unless="${sensorDataList}">
-              <p>None</p>
-
-              
-                          
-          </div>
-
-               <!-- <div id="chartContainer" style="height: 550px; width: 100%;">
-                <div th:if="${sensorDataList.sensorDataId=='Luqmanaz'}">
-                <iframe width="100%" height="500" frameborder="0" src="https://stem.ubidots.com/app/dashboards/public/widget/tziPQVCJqiqio5HyQxSXuVaxwV6Ol_sDV4EEPG0fXmg?embed=true"></iframe>
-                </div>
-                </div>-->
-
-
-                <table class = "table-bordered">
-                  <tr>
-                      <td>Normal</td>
-                      <td><div style="width: 20px; height: 20px; background-color: rgb(130, 255, 130);"></div></td>
-                  </tr>
-                  <tr>
-                      <td>Not normal</td>
-                      <td><div style="width: 20px; height: 20px; background-color: rgb(255, 90, 90);"></div></td>
-                  </tr>
-              </table><br>
-                Current/Latest Data
-                <table class="table table-bordered border border-dark">
-                    <thead>
-                    <tr>
-                        <th scope="col">Body Temperature(Celsius)</th>
-                        <th scope="col">Oxygen Saturation(SpO2)%</th>
-                        <th scope="col">ECG</th>
-                        <th scope="col">Heart Rate</th>
-                        <th scope="col">Date & Time</th>
-                    </tr>
-                    </thead>
-                    <tbody class="tbody">
-                    <tr th:each="sensorData:${sensorDataList}">
-                        <td id="exist" th:style="${sensorData.bodyTemperature} > 37.2 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'" >
-                            [[${sensorData.bodyTemperature}]]</td>
-                        <td th:style="${sensorData.oxygenReading} < 94 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'" >
-                            [[${sensorData.oxygenReading}]]</td>
-                        <td th:text="${sensorData.ecgReading}">-</td>
-                        <td th:style="${sensorData.Heart_Rate} > 90 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'" >
-                            [[${sensorData.Heart_Rate}]]</td>
-                        <td th:text="${#dates.format(sensorData.timestamp, 'dd MMM yyyy HH:mm')}">-</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <table th:if="${sensorDataListHistory}" class="table table-bordered border border-dark table-container">
-                    <thead>
-                    <tr>
-                        <th scope="col">Body Temperature(Celsius)</th>
-                        <th scope="col">Oxygen Saturation(SpO2)%</th>
-                        <th scope="col">ECG</th>
-                        <th scope="col">Heart Rate</th>
-                        <th scope="col">Date & Time</th>
-                    </tr>
-                    </thead>
-                    <tbody class="tbody">
-                    <tr th:each="sensorData:${sensorDataListHistory}">
-                        <td id="exist" th:style="${sensorData.bodyTemperature} > 37.2 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'">
-                            [[${sensorData.bodyTemperature}]]
-                        </td>
-                        <td th:style="${sensorData.oxygenReading} < 94 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'">
-                            [[${sensorData.oxygenReading}]]
-                        </td>
-                        <td th:text="${sensorData.ecgReading}">-</td>
-                        <td th:style="${sensorData.Heart_Rate} > 90 ? 'background-color: rgb(255, 90, 90);': 'background-color: rgb(130, 255, 130);'">
-                            [[${sensorData.Heart_Rate}]]
-                        </td>
-                        <td th:text="${#dates.format(sensorData.timestamp, 'dd MMM yyyy HH:mm')}">-</td>
-                    </tr>
-                    </tbody>
-                </table>
-                 <!-- will display when sensor data is NULL -->
-                 <div th:style="${sensorDataList != null} ? 'display: none'" >
-                    <h2>There is no Sensor ID Attach to this Patient.</h2>
-                    <button class= "btn btn-warning" th:onclick="'showModal()'">Create</button>
-                </div>
-                <!-- will display when sensor data is Exist -->
-                <!-- <div th:style="${sensorDataList == null} ? 'display: none'" >
-                  
-                  <form method="post" th:action="@{/patient/savehistory}">
-  
-                    <input type="hidden" th:name="patientid" th:value="${patientid}"/>
-                    <button class= "submit btn btn-warning">Save to History</button>
-                  
-                  </form>
-              </div> -->
-  
-              </div>
+        </div>
+    </div>
                 
-                <!-- Chart container -->
-                <div style="width: 80%; margin: auto;">
-                    <canvas id="bodyTemperatureChart"></canvas>
-                </div>
-                <div style="width: 80%; margin: auto;">
-                    <canvas id="oxygenSaturationChart"></canvas>
-                </div>
-                <div style="width: 80%; margin: auto;">
-                    <canvas id="ecgChart"></canvas>
-                </div>
-                <div style="width: 80%; margin: auto;">
-                    <canvas id="heartRateChart"></canvas>
-                </div>
-                
-                <script>
+    <script>
     // Extract ECG and timestamp data from the table
     var ecgData = [];
 

@@ -7,6 +7,7 @@ import com.SmartHealthRemoteSystem.SHSR.Service.PatientService;
 import com.SmartHealthRemoteSystem.SHSR.Service.PrescriptionService;
 import com.SmartHealthRemoteSystem.SHSR.User.Doctor.Doctor;
 import com.SmartHealthRemoteSystem.SHSR.User.Patient.Patient;
+import com.SmartHealthRemoteSystem.SHSR.ViewDoctorPrescription.PrescribeMedicine;
 import com.SmartHealthRemoteSystem.SHSR.ViewDoctorPrescription.Prescription;
 import com.SmartHealthRemoteSystem.SHSR.WebConfiguration.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import javax.print.attribute.standard.Media;
@@ -71,50 +73,57 @@ public class SendPrescriptionController {
         return "patientMedicine";
     }
 
-    // @PostMapping("/add-prescription/submit")
-    // public String submitMedicineForm(Model model,
-    //         @RequestParam String patientId,
-    //         @RequestParam String addMed,
-    //         @RequestParam int quantity) 
-    //         throws ExecutionException, InterruptedException {
-    
+    // @GetMapping("/prescribeMedicine")
+    // public String addMedication(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
     //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    //     MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
+    //     MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
     //     Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
+
+    //     List<Medicine> medicineList = medicineService.getListMedicine();
     
-    //     medicineService.prescribeMedicine(addMed, quantity, patientId);
-    
-    //     List<Medicine> prescribeList = medicineService.getListPrescribe(patientId);
-        
     //     model.addAttribute("patientName", patientService.getPatient(patientId).getName());
     //     model.addAttribute("patientId", patientId);
-    //     model.addAttribute("doctor", doctor);
-    //     model.addAttribute("prescribeList", prescribeList);
-        
-    //     // Redirect to the prescription form with the patientId parameter
-    //     return "redirect:/prescription/form?patientId=" + patientId;
+    //     model.addAttribute("doctor",doctor);
+    //     model.addAttribute("medicineList", medicineList);
+    //     return "patientMedicine";
     // }
 
-     @PostMapping("/prescribeMedicine")
+    @PostMapping("/prescribemedicine/submit")
     public String prescribeMedicine(Model model,
-            @RequestParam (value= "medId")String medId,
-            @RequestParam (value= "quantity")int quantity) 
-            throws ExecutionException, InterruptedException {
-    
+        @RequestParam Map<String, String> allParams,
+        @RequestParam (value= "selectedMedicines") List<String> selectedMedicines,
+        @RequestParam String patientId)
+        throws ExecutionException, InterruptedException {
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
 
-        Medicine medicine = medicineService.getMedicine(medId);
-        medicineService.prescribeMedicine(medId, quantity);
-    
-        List<Medicine> prescribeList = medicineService.getListPrescribe(medId);
-        
+        List<PrescribeMedicine> prescribedMedicines = new ArrayList<>();
+
+        for (String medName : selectedMedicines) {
+            String quantityParam = "quantity_" + medName.replace(" ", "_"); // Ensure that the parameter name is consistent with the input name attribute
+            String quantityStr = allParams.get(quantityParam);
+            if (quantityStr != null && !quantityStr.isEmpty()) {
+                int quantity = Integer.parseInt(quantityStr);
+
+                // Prescribe medicine and deduct stock
+                medicineService.prescribeMedicine(patientId, medName, quantity);
+
+                // Add the prescribed medicine to a new prescription
+                prescriptionService.addMedicineToNewPrescription(patientId, doctor.getUserId(), medName, quantity);
+
+                // Add to local list to be displayed later
+                prescribedMedicines.add(new PrescribeMedicine(medName, patientId, quantity));
+            }
+        }
+
+        model.addAttribute("patientId", patientId);
         model.addAttribute("doctor", doctor);
-        model.addAttribute("prescribeList", prescribeList);
-        
-        // Redirect to the prescription form with the patientId parameter
-        return "sendPrescriptionForm";
+        model.addAttribute("prescribedMedicines", prescribedMedicines);
+
+        // Redirect to the page that displays the prescribed medicines list
+        return "PatientMedicine";
     }
 
     @PostMapping("/form/submit")
