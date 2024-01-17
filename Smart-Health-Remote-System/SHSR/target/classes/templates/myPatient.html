@@ -38,7 +38,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a th:href="@{/doctor/myPatient(pageNo=1)}" class="nav-link active f" aria-current="page">
+                            <a th:href="@{/doctor/myPatient(pageNo=0)}" class="nav-link active f" aria-current="page">
                                 My Patient
                             </a>
                         </li>
@@ -71,7 +71,13 @@
                 <h1 d-flex justify-content-start>My Patient</h1>
                 <br>
                 <!-- search button -->
-                <input type="text" placeholder="Enter keyword to search" id="search-input" style="width: 50%" class="search-input" >
+                <!-- <input type="text" placeholder="Enter keyword to search" id="search-input" style="width: 50%" class="search-input" > -->
+                <form th:action="@{/doctor/myPatient}" method="get">
+                    <input type="text" name="searchQuery" placeholder="Enter keyword to search" th:value="${searchQuery}" style="width: 50%">
+                    <input type="hidden" name="pageNo" th:value="${currentPage}">
+                    <input type="hidden" name="pageSize" th:value="${pageSize}">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
                 <!-- search button end-->
                 <div style="padding-top: 30px; width: auto;" class="d-flex justify-content-center align-items-center">
                     <table class="table table-bordered medicineTable" >
@@ -83,9 +89,10 @@
                         </tr>
                         </thead>
                         <tbody class="tbody">
+                            
                             <!-- patient paging display start -->
-                            <tr th:each="pacnt : ${patientList}" class="product" id="product">
-                                <td th:text="${pacntStat.index}+1"></td>
+                            <tr th:each="pacnt, patientStat : ${patientList}"class="product" id="product">
+                                <td th:text="${startIndex + patientStat.index + 1}"></td>
                                 <td><span class="name" th:text="${pacnt.name}"></span></td>
                                 <!--VIEW HEALTH-->
                                 <td>
@@ -140,20 +147,21 @@
                     </table>
                 </div>
                 <!-- paging button start -->
-                <div class="d-flex justify-content-center align-items-center">
-                    <nav aria-label="Page navigation example" th:if="${totalPage>1}">
-                        <ul class="pagination">
-                            <a class="page-link" th:href="@{/doctor/myPatient(pageNo=${prevPage})}">&lt</a>
-                            <li class="page-item" th:each="i: ${#numbers.sequence(1,totalPage)}">
-                                <a class="page-link" th:href="@{/doctor/myPatient(pageNo=${i})}" >[[${i}]]</a>
-                            </li>
-                            <a class="page-link" th:href="@{/doctor/myPatient(pageNo=${nextPage})}" >&gt</a>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="d-flex justify-content-center align-items-center bg-primary bg-opacity-25 shadow-lg rounded">
-                    <p class="btn "><b>Page: <scope th:text="${currentPage}"></scope></b></p>
-                </div>
+                               <!-- Pagination Controls -->
+                               <nav aria-label="Patient navigation">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{/doctor/myPatient(pageNo=${currentPage - 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Previous</a>
+                                    </li>
+                                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''">
+                                        <a class="page-link" th:href="@{/doctor/myPatient(pageNo=${i}, pageSize=${pageSize}, searchQuery=${searchQuery})}" th:text="${i + 1}"></a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                                        <a class="page-link" th:href="@{/doctor/myPatient(pageNo=${currentPage + 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            
                 <!-- paging button end -->
             </div>
         </div>
@@ -201,21 +209,11 @@
         })
     })
    
-    const searchInput = document.getElementById('search-input');
+
+
+const searchInput = document.getElementById('search-input');
     searchInput.addEventListener('input', () => {
-    const query = searchInput.value.trim().toLowerCase();
-
-    const patientList = document.getElementsByClassName('product');
-
-    for (const pacnt of patientList) {
-        const name = pacnt.getElementsByClassName('name')[0].textContent;
-
-        if (name.includes(query) ) {
-            pacnt.style.display = 'table-row';
-        } else {
-            pacnt.style.display = 'none';
-        }
-    }
+        // ... JavaScript code for client-side filtering ...
     });
 </script>
 
