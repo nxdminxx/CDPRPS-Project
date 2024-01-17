@@ -64,13 +64,33 @@ public class AssignPatientController {
     }
 
     @PostMapping("/assigntoDoctor")
-    public String AssigntoDoctor(Model model, @RequestParam (value= "patientId")String patientID) throws ExecutionException, InterruptedException {
+    public String AssigntoDoctor(Model model, @RequestParam (value= "patientId")String patientID,  @RequestParam(defaultValue = "0") int pageNo, 
+    @RequestParam(defaultValue = "5") int pageSize, @RequestParam(defaultValue = "") String searchQuery) throws ExecutionException, InterruptedException {
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = assignPatientServices.getDoctor(myUserDetails.getUsername());
         Patient patient =assignPatientServices.getPatient(patientID);
         assignPatientServices.AssignPatient(patientID,doctor.getUserId());
-        List<Patient> patientList= assignPatientServices.getListPatient();
+        // List<Patient> patientList= assignPatientServices.getListPatient();
+
+        List<Patient> allPatients = assignPatientServices.getListPatient();
+
+
+        if (!searchQuery.isEmpty()) {
+            allPatients = allPatients.stream()
+                                     .filter(p -> p.getName().toLowerCase().contains(searchQuery.toLowerCase()) 
+                                               || p.getUserId().toString().contains(searchQuery))
+                                     .collect(Collectors.toList());
+        }
+    
+            int total = allPatients.size();
+            int start = Math.min(pageNo * pageSize, total);
+            int end = Math.min((pageNo + 1) * pageSize, total);
+            int startIndex = pageNo * pageSize;
+
+
+            List<Patient> patientList = allPatients.subList(start, end);
 
         //SMTP - Izzati
         var to = patient.getEmail();
@@ -79,9 +99,14 @@ public class AssignPatientController {
         +"For any further information, do not hesitate to email us back.\nThank you.";
         var mailStructure = new MailStructure(to,subject,message);
         mailService.sendAssignedMail(to, subject, message, mailStructure);
-        
+
+
+        model.addAttribute("startIndex", startIndex);
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", (total + pageSize - 1) / pageSize);
         model.addAttribute("patientList",patientList);
         model.addAttribute("doctor",doctor);
+        model.addAttribute("searchQuery", searchQuery);
         return "assignpatient";
     }
 
@@ -95,7 +120,7 @@ public class AssignPatientController {
         assignPatientServices.UnassignDoctor(patientID,doctor.getUserId());
         List<Patient> patientList=assignPatientServices.getListPatient();
 
-        //SMTP - Izzati
+        // SMTP - Izzati
         var to = patient.getEmail();
         var subject = "You have been UNASSIGNED from a Doctor";
         var message = "Hello Dear "+patient.getName()+", We are to inform you that you have been UNASSIGNED from  Dr. ("+doctor.getName()+"-"+doctor.getUserId()+")\n\n"

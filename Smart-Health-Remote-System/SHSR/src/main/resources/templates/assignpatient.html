@@ -111,7 +111,13 @@ and open the template in the editor.
                             
                             <div class="confirmation">
 
-                                <button type="button" class="btn btn-primary assignbtn">Assign Patient</button>
+                                <!-- <button type="button" class="btn btn-primary assignbtn">Assign Patient</button>
+                                 -->
+
+                                 <form th:action="@{/assignpatient/assigntodoctor}" method="post" class="assignform">
+                                    <input type="hidden" name="patientId" th:value="${patient.userId}" />
+                                    <button type="button" class="btn btn-primary assignbtn">Assign Patient</button>
+                                </form>
 
                             </div>
                         </td>
@@ -121,22 +127,13 @@ and open the template in the editor.
                     </tbody>
 
                 </table>
+                <!-- <form th:action="@{/assignpatient/assigntoDoctor}" method="post" class="assignform">
+                    <input type="hidden" name="patientId" th:value="${patientList[i].userId}" /> -->
+                    <!-- Add any other hidden fields or data you need to submit -->
+                <!-- </form> -->
+    
+
                 </div>
-                
-                <!-- Pagination Controls -->
-                <nav aria-label="Patient navigation">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
-                            <a class="page-link" th:href="@{/assignpatient(pageNo=${currentPage - 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Previous</a>
-                        </li>
-                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''">
-                            <a class="page-link" th:href="@{/assignpatient(pageNo=${i}, pageSize=${pageSize}, searchQuery=${searchQuery})}" th:text="${i + 1}"></a>
-                        </li>
-                        <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
-                            <a class="page-link" th:href="@{/assignpatient(pageNo=${currentPage + 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Next</a>
-                        </li>
-                    </ul>
-                </nav>
                 
 
                 <div class="confirmation_page">
@@ -153,6 +150,20 @@ and open the template in the editor.
                     </div>
                 </div>
             </div>
+            <!-- Pagination Controls -->
+            <nav aria-label="Patient navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/assignpatient(pageNo=${currentPage - 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/assignpatient(pageNo=${i}, pageSize=${pageSize}, searchQuery=${searchQuery})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/assignpatient(pageNo=${currentPage + 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Next</a>
+                    </li>
+                </ul>
+            </nav>
             
         </div>
     </div>
@@ -182,6 +193,7 @@ and open the template in the editor.
         $(document).on('click', '.confirmBtn', function () {
             $('.assignform').get(i).submit();
         })
+    });
             //izzati
         //     $.ajax({
         //         type: 'POST',
@@ -208,7 +220,7 @@ and open the template in the editor.
 
         
 
-    })
+
 
     // const searchInput = document.getElementById('search-input');
     // searchInput.addEventListener('input', () => {
