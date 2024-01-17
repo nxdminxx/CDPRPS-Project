@@ -20,19 +20,69 @@
 <div class="container shadow p-3 mb-5  bg-primary bg-opacity-25 rounded" style="position: relative; top: 50px;">
     <div class="container overflow-hidden">
         <div class="row gx-5">
+            <div class="col ">
+                <div class="d-flex shadow flex-column flex-shrink-0 p-3 bg-primary bg-opacity-25 rounded">
+                    <a th:href="@{/patient}" class="card-link" style="text-decoration: none; color: black;">
+                        <div class="card bg-primary bg-opacity-25 rounded">
+                            <img class="card-img-top" src="/image/img_avatar1.png" alt="Card image" >
+                            <div class="card-body">
+                                <h3 class="card-title">rakesh</h3>
+                                <p style=" font-size: 12px;">Patient Contact No. :<span>012345690</span></p>
+                                <p style=" font-size: 12px;">Patient Address : <span>aaabbb</span></p>
+                                <p style=" font-size: 12px;">Emergency Contact No. : <span>sheesh</span></p>
+                            </div>
+                        </div>
+                    </a>
+                    <hr>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" aria-current="page">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <!-- <form th:action="@{/viewPatientHealthStatus/b(patientId=${patient.userId},doctorId=${doctor.userId})}" method="post" name="viewPatient" class="viewPatientForm">
+                                <input type="text" th:value="${doctor.userId}" th:name="doctorId" id="doctorId"  hidden="hidden">
+                                <input type="text" th:value="${patient.userId}" th:name="patientId" id="patientId" hidden="hidden"> -->
+                                <a role="button" class="nav-link link-dark f">View</a> 
+                            <!-- </form> -->
 
-            <form th:action="@{/patient/backDashboard}"   method="post">
-                <div>
-                    <input type="hidden" th:value="${patient.userId}" th:name="patientId">
-                    <input type="hidden" th:value="${doctor.userId}" th:name="doctorId">
-                </div>
-    
-                <div list-group-item class="m-3 d-flex justify-content-left align-items-center " >
-                    <input class="btn btn-secondary confirmBtn " value="Back" type="submit">
-                </div>
-            </form>
+                        </li>
+                        <li>
+                            <a class="nav-link link-dark f" name="editProfile">
+                                Edit Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a  class="nav-link link-dark f" name="HealthCondition">Health Condition</a>
+                                
+                            </a>
+                        </li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" hidden="true" name="logoutForm">
+                                <button>Logout</button>
+                            </form>
+                            <a href="javascript: document.logoutForm.submit()" class="nav-link link-dark f">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
 
+                </div>
+            </div>
             <div class="col-9">
+                
+                <form th:action="@{/patient/backDashboard}"   method="post">
+                    <div>
+                        <input type="hidden" th:value="${patient.userId}" th:name="patientId">
+                        <input type="hidden" th:value="${doctor.userId}" th:name="doctorId">
+                    </div>
+        
+                    <div list-group-item class="m-3 d-flex justify-content-left align-items-center " >
+                        <input class="btn btn-secondary confirmBtn " value="Back" type="submit">
+                    </div>
+                </form>
+
                 <h1 d-flex justify-content-start>History of health status</h1>
                     <h3 th:if="${patient}" th:text="${patient.name}">Name: </h3>
                     <h3 th:if="${patient}" th:text="${patient.contact}">Contact number: </h3>
@@ -83,6 +133,7 @@
                 </div>
 
             </div>
+
         </div>
     </div>
 </div>
