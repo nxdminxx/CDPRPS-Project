@@ -32,9 +32,17 @@
     <div class="container overflow-hidden">
 
 
-            <div list-group-item class="m-3 d-flex justify-content-left align-items-center " >
+        <div list-group-item class="m-3 d-flex justify-content-left align-items-center">
+            <!-- Check if the user type is doctor -->
+            <th:block th:if="${userType == 'doctor'}">
                 <a class="btn btn-secondary confirmBtn" th:href="@{/doctor/myPatient(pageNo=1)}">Back</a>
-            </div>
+            </th:block>
+        
+            <!-- Check if the user type is patient -->
+            <th:block th:if="${userType == 'patient'}">
+                <a class="btn btn-secondary confirmBtn" th:href="@{/patient/backDashboard}">Back</a>
+            </th:block>
+        </div>
 
 
             <h1 class="d-flex justify-content-start"> Health Condition</h1>
