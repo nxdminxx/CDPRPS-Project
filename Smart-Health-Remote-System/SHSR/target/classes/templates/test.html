@@ -19,15 +19,17 @@
             <div class="row gx-5">
                 <div class="col">
                     <div class="d-flex shadow flex-column flex-shrink-0 p-3 bg-primary bg-opacity-25 rounded">
-                        <div class="card bg-primary bg-opacity-25 roundend">
-                            <img class="card-img-top" src="/image/img_avatar1.png" alt="Card Image">
-                            <div class="card-body">
-                                <h3 class="card-title"></h3>
-                                <p style="font-size: 12px;">Patient Contact No</p>
-                                <p style="font-size: 12px;">Patient Address</p>
-                                <p style="font-size: 12px;">Emergency Contact No</p>
+                        <a th:href="@{/patient}" class="card-link" style="text-decoration: none; color: black;">
+                            <div class="card bg-primary bg-opacity-25 rounded">
+                                <img class="card-img-top" src="/image/img_avatar1.png" alt="Card image" >
+                                <div class="card-body">
+                                    <h3 class="card-title" th:text="${patient.name}"></h3>
+                                    <p style=" font-size: 12px;">Patient Contact No. : <span th:text="${patient.contact}"></span></p>
+                                    <p style=" font-size: 12px;">Patient Address : <span th:text="${patient.address}"></span></p>
+                                    <p style=" font-size: 12px;">Emergency Contact No. : <span th:text="${patient.emergencyContact}"></span></p>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                         <hr>
                         <ul class="nav nav-pills flex-column mb-auto">
                             <li class="nav-item">
