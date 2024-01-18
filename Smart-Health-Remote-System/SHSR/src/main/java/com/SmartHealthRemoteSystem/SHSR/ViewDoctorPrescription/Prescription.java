@@ -9,6 +9,7 @@ public class Prescription {
     private String timestamp;
     private String doctorId;
     private List<String> medicineList;
+    private List<PrescribeMedicine> prescribeList;
     private String prescriptionDescription;
     private String diagnosisAilmentDescription;
 
@@ -79,5 +80,17 @@ public class Prescription {
 
     public void setDiagnosisAilmentDescription(String diagnosisAilmentDescription) {
         this.diagnosisAilmentDescription = diagnosisAilmentDescription;
+    }
+
+    public String getFormattedMedicineList() {
+        return String.join(", ", medicineList);
+    }
+
+    public List<PrescribeMedicine> getPrescribeList() {
+        return prescribeList;
+    }
+
+    public void setPrescribeList(List<PrescribeMedicine> prescribeList) {
+        this.prescribeList = prescribeList;
     }
 }
