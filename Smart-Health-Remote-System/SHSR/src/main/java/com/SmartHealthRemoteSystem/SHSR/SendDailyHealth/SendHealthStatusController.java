@@ -60,6 +60,12 @@ public class SendHealthStatusController {
         //healthstatus service utk retrieve symptom
         return "sendDailyHealthSymptom";
     }
+    
+    @GetMapping("/Diagnosis")
+    public String showDiagnosisPage() {
+        return "Diagnosis"; // Assuming "Diagnosis.html" is in your templates directory
+    }
+
 }
 
 
