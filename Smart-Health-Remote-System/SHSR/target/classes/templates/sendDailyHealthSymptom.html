@@ -87,7 +87,7 @@
 
                                 <h1 >Share your today's symptom!</h1>
 
-                                <form action="" method="get">
+                                <form action="http://localhost:8082/diagnosis/receiveSymptoms" method="get">
                                     <div class="list-group-item m-3 d-flex justify-content-center align-items-center bg-primary bg-opacity-50 rounded">
                                         <input type="hidden" th:value="${patient.userId}" th:name="patientId">
                                         <input type="hidden" th:value="${doctor.userId}" th:name="doctorId">
