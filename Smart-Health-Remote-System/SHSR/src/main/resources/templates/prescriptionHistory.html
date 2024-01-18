@@ -79,28 +79,59 @@
             </div>
             <div class="col-9">
                 <h2>Prescription History</h2>
+                <br>
+                <!-- search button -->
+                <!-- <input type="text" placeholder="Enter keyword to search" id="search-input" style="width: 50%" class="search-input" > -->
+                <form th:action="@{/doctor/myPatient}" method="get">
+                    <input type="text" name="searchQuery" placeholder="Enter keyword to search" th:value="${searchQuery}" style="width: 50%">
+                    <input type="hidden" name="pageNo" th:value="${currentPage}">
+                    <input type="hidden" name="pageSize" th:value="${pageSize}">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+                <!-- search button end-->
+                <br>
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Date/Time</th>
-                            <th>Doctor</th>
                             <th>Prescription</th>
                             <th>Diagnosis/Ailment</th>
+                            <th>Medicines</th> <!-- New column for medicines -->
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Loop through prescription history and display each prescription -->
-                        <tr th:each="prescription : ${prescriptionHistory}">
-                            <td th:text="${prescription.timestamp}"></td>
-                            <td th:text="${prescription.doctorId}"></td>
+                        <tr th:each="prescription, stat : ${prescriptionHistory}">
                             <td th:text="${prescription.prescriptionDescription}"></td>
                             <td th:text="${prescription.diagnosisAilmentDescription}"></td>
+                            <td th:text="${#strings.listJoin(prescription.medicineList, ', ')}"></td> <!-- Displaying medicines -->
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination Controls -->
+            <nav aria-label="Patient navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/prescription/history(pageNo=${currentPage - 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/prescription/history(pageNo=${i}, pageSize=${pageSize}, searchQuery=${searchQuery})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/prescription/history(pageNo=${currentPage + 1}, pageSize=${pageSize}, searchQuery=${searchQuery})}">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
+
+<script>
+    const searchInput = document.getElementById('search-input');
+    searchInput.addEventListener('input', () => {
+        // ... JavaScript code for client-side filtering ...
+    });
+</script>
+
 </body>
 </html>

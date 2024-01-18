@@ -79,7 +79,7 @@ public class DoctorController {
                                  .filter(p -> p.getName().toLowerCase().contains(searchQuery.toLowerCase()) 
                                            || p.getUserId().toString().contains(searchQuery))
                                  .collect(Collectors.toList());
-    }
+         }
     
         int total = allPatients.size();
         int start = Math.min(pageNo * pageSize, total);

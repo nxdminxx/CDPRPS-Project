@@ -16,14 +16,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javax.print.attribute.standard.Media;
-import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/prescription")
@@ -43,22 +47,29 @@ public class SendPrescriptionController {
     }
 
     @GetMapping("/form")
-    public String getPrescriptionForm(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
+    public String getPrescriptionForm(@RequestParam String patientId, Model model, HttpServletRequest request) throws ExecutionException, InterruptedException {
+        
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
 
-        List<Medicine> prescribList = medicineService.getListPrescribe(patientId); //tukar utk dptkan stock medicine list
+        // Retrieve the list of prescribed medicines from the session or any temporary storage
+        // List<Medicine> prescribedMedicines = (List<Medicine>) request.getSession().getAttribute("prescribedMedicines");
+
+        List<Medicine> medicineList = medicineService.getListMedicine(); //getListprecribemedicine
 
         model.addAttribute("patientName", patientService.getPatient(patientId).getName());
         model.addAttribute("patientId", patientId);
         model.addAttribute("doctor",doctor);
-        model.addAttribute("prescribList", prescribList);
+        
+        // model.addAttribute("prescribeList", prescribedMedicines);
+        model.addAttribute("medicineList", medicineList);
+
         System.out.println("patient id before"+patientId);
         return "sendPrescriptionForm";
     }
-
-    @GetMapping("/add-prescription")
+    
+    @GetMapping("/add-prescription") //got to medicine list to be assign utk doctor
     public String addMedication(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
@@ -73,57 +84,53 @@ public class SendPrescriptionController {
         return "patientMedicine";
     }
 
-    // @GetMapping("/prescribeMedicine")
-    // public String addMedication(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
-    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    //     MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
-    //     Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
-
-    //     List<Medicine> medicineList = medicineService.getListMedicine();
-    
-    //     model.addAttribute("patientName", patientService.getPatient(patientId).getName());
-    //     model.addAttribute("patientId", patientId);
-    //     model.addAttribute("doctor",doctor);
-    //     model.addAttribute("medicineList", medicineList);
-    //     return "patientMedicine";
-    // }
-
-    @PostMapping("/prescribemedicine/submit")
-    public String prescribeMedicine(Model model,
-        @RequestParam Map<String, String> allParams,
-        @RequestParam (value= "selectedMedicines") List<String> selectedMedicines,
-        @RequestParam String patientId)
-        throws ExecutionException, InterruptedException {
+    @PostMapping("/prescribemedicine/submit")  //business logic to create new object of prescribe medicine based on what doctor has select med name and input the prescribe quantity
+    public String submitMedicineForm(Model model,
+                                 @RequestParam String patientId,
+                                 @RequestParam Map<String, String> allParams,
+                                 RedirectAttributes redirectAttributes) 
+                                 throws ExecutionException, InterruptedException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
+        MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
         Doctor doctor = doctorService.getDoctor(myUserDetails.getUsername());
 
-        List<PrescribeMedicine> prescribedMedicines = new ArrayList<>();
+        // Extract selected medicines from form medicine list
+        Map<String, Integer> selectedMedicinesWithQuantities = allParams.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith("quantity_") && !entry.getValue().isEmpty())
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().substring("quantity_".length()),
+                        entry -> Integer.parseInt(entry.getValue())
+                ));
 
-        for (String medName : selectedMedicines) {
-            String quantityParam = "quantity_" + medName.replace(" ", "_"); // Ensure that the parameter name is consistent with the input name attribute
-            String quantityStr = allParams.get(quantityParam);
-            if (quantityStr != null && !quantityStr.isEmpty()) {
-                int quantity = Integer.parseInt(quantityStr);
+        //get selected medicine id with prescribe quantity
+        List<String> selectedMedicineIds = allParams.entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith("selectedMedicines") && entry.getValue().equals("on"))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
 
-                // Prescribe medicine and deduct stock
-                medicineService.prescribeMedicine(patientId, medName, quantity);
+        Map<String, Integer> prescribedMedicines = selectedMedicinesWithQuantities.entrySet().stream()
+                .filter(entry -> selectedMedicineIds.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-                // Add the prescribed medicine to a new prescription
-                prescriptionService.addMedicineToNewPrescription(patientId, doctor.getUserId(), medName, quantity);
+        // Call the service to prescribe the medicines
+        // Replace "Prescription Description" and "Diagnosis Ailment Description" with actual values or parameters as needed
+        prescriptionService.prescribeMedicines(patientId, prescribedMedicines,
+                                               "Prescription Description", 
+                                               "Diagnosis Ailment Description", 
+                                               medicineService);
 
-                // Add to local list to be displayed later
-                prescribedMedicines.add(new PrescribeMedicine(medName, patientId, quantity));
-            }
-        }
+        System.out.println("patient id before: "+patientId);
 
+        List<Medicine> medicineList = medicineService.getListMedicine();
+        
+        model.addAttribute("patientName", patientService.getPatient(patientId).getName());
         model.addAttribute("patientId", patientId);
-        model.addAttribute("doctor", doctor);
-        model.addAttribute("prescribedMedicines", prescribedMedicines);
+        model.addAttribute("doctor",doctor);
+        model.addAttribute("medicineList", medicineList);
 
-        // Redirect to the page that displays the prescribed medicines list
-        return "PatientMedicine";
+        redirectAttributes.addAttribute("patientId", patientId); // Ensure the patientId is included in the redirect
+        return "redirect:/prescription/form";
     }
 
     @PostMapping("/form/submit")
@@ -135,14 +142,12 @@ public class SendPrescriptionController {
                                          @RequestParam(value = "patientMedList") List<String> patientMedList)
             throws ExecutionException, InterruptedException {
 
-
         System.out.println("patient id before"+patientId);
         
         Prescription prescription1 = new Prescription(doctorId,
                 patientMedList,
                 prescription,
                 diagnosisAilment);
-
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         MyUserDetails myUserDetails= (MyUserDetails) auth.getPrincipal();
@@ -156,10 +161,30 @@ public class SendPrescriptionController {
     }
 
     @GetMapping("/history")
-    public String viewPrescriptionHistory(@RequestParam String patientId, Model model) throws ExecutionException, InterruptedException {
-        List<Prescription> prescriptionHistory = prescriptionService.getListPrescription(patientId);
-        model.addAttribute("prescriptionHistory", prescriptionHistory);
+        public String viewPrescriptionHistory(@RequestParam String patientId, Model model, @RequestParam(defaultValue = "0") int pageNo, 
+        @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "") String searchQuery) throws ExecutionException, InterruptedException {
+            
+            List<Prescription> allPrescription = prescriptionService.getListPrescription(patientId);
+
+            if (!searchQuery.isEmpty()) {
+            allPrescription = allPrescription.stream()
+                                    .filter(p -> p.getPrescriptionDescription().toLowerCase().contains(searchQuery.toLowerCase()) 
+                                            || p.getDiagnosisAilmentDescription().toString().contains(searchQuery))
+                                    .collect(Collectors.toList());
+            }
+        
+            int total = allPrescription.size();
+            int start = Math.min(pageNo * pageSize, total);
+            int end = Math.min((pageNo + 1) * pageSize, total);
+            int startIndex = pageNo * pageSize;if (!searchQuery.isEmpty());
+            
+            List<Prescription> prescriptionHistory = allPrescription.subList(start, end);
+            model.addAttribute("startIndex", startIndex);
+            model.addAttribute("currentPage", pageNo);
+            model.addAttribute("totalPages", (total + pageSize - 1) / pageSize);
+            model.addAttribute("searchQuery", searchQuery);
+            model.addAttribute("prescriptionHistory", prescriptionHistory);
+
         return "prescriptionHistory";
     }
-
 }
