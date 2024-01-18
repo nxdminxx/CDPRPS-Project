@@ -1,16 +1,19 @@
 package com.SmartHealthRemoteSystem.SHSR.Service;
 
+import com.SmartHealthRemoteSystem.SHSR.Medicine.Medicine;
 import com.SmartHealthRemoteSystem.SHSR.Repository.SHSRDAO;
 import com.SmartHealthRemoteSystem.SHSR.Repository.SubCollectionSHSRDAO;
-import com.SmartHealthRemoteSystem.SHSR.ViewDoctorPrescription.PrescribeMedicine;
 import com.SmartHealthRemoteSystem.SHSR.ViewDoctorPrescription.Prescription;
+import com.SmartHealthRemoteSystem.SHSR.WebConfiguration.MyUserDetails;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -46,41 +49,28 @@ public class PrescriptionService {
         return prescriptionRepository.delete(patientId, prescriptionId);
     }
 
-    public String addMedicineToNewPrescription(String patientId, String doctorId, String medId, int quantity) throws ExecutionException, InterruptedException {
-        // Create a new Prescription object
-        Prescription newPrescription = new Prescription();
-        newPrescription.setDoctorId(doctorId);
-        // You can set the timestamp here based on your requirements
-        newPrescription.setTimestamp(new Timestamp(System.currentTimeMillis()).toString());
-        
-        // Add the prescribed medicine to the prescription's medicine list
-        List<String> medicineList = new ArrayList<>();
-        medicineList.add(medId); // Here you could add both medId and quantity or create a custom object that holds both
-        newPrescription.setMedicineList(medicineList);
-        
-        // Optionally, set other details like prescription description or diagnosis
-        newPrescription.setPrescriptionDescription("Prescription for " + patientId); // This is an example, set a real description
-        newPrescription.setDiagnosisAilmentDescription("Diagnosis for " + patientId); // This is an example, set a real diagnosis
-        
-        // Save the new prescription in the database
-        return createPrescription(newPrescription, patientId);
-    }
+    public String prescribeMedicines(String patientId, Map<String, Integer> selectedMedicines, String prescriptionDescription, String diagnosisAilmentDescription, MedicineService medicineService) throws ExecutionException, InterruptedException {
+        // Obtain the doctor's ID from the current user's details
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        MyUserDetails myUserDetails = (MyUserDetails) auth.getPrincipal();
+        String doctorId = myUserDetails.getUsername();
 
-    public List<PrescribeMedicine> getPrescribedMedicines(String patientId) throws ExecutionException, InterruptedException {
-        List<Prescription> prescriptions = getListPrescription(patientId); // Retrieve all prescriptions for the patient
-        List<PrescribeMedicine> prescribedMedicines = new ArrayList<>();
-    
-        // Iterate through all prescriptions
-        for (Prescription prescription : prescriptions) {
-            // Assuming Prescription contains a list of PrescribeMedicine objects
-            // This requires a getPrescribedMedicines method or similar in the Prescription class.
-            // List<PrescribeMedicine> prescribeMedicineList = prescription.getPrescribedMedicines(); // This method needs to be implemented in the Prescription class
-            
-            // Add all PrescribeMedicine objects to the list to be returned
-            // prescribedMedicines.addAll(prescribeMedicineList);
+        // Retrieve the full medicine details for each selected medicine
+        List<String> medicineDetailsList = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : selectedMedicines.entrySet()) {
+            Medicine medicine = medicineService.getMedicine(entry.getKey());
+            if (medicine != null) {
+                // Decrease the stock available by the quantity prescribed
+                medicineService.prescribeMedicine(patientId, medicine.getMedId(), entry.getValue());
+                // Add a formatted string with the medicine name and prescribed quantity
+                medicineDetailsList.add(medicine.getMedName() + " - Quantity: " + entry.getValue());
+            }
         }
-        
-        return prescribedMedicines;
-    }
 
+        // Create a new Prescription object with the formatted list of medicines
+        Prescription prescription = new Prescription(doctorId, medicineDetailsList, prescriptionDescription, diagnosisAilmentDescription);
+
+        // Save the prescription in the repository using the provided patient ID
+        return prescriptionRepository.save(prescription, patientId);
+    }
 }

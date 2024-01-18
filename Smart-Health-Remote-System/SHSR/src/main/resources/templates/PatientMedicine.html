@@ -97,36 +97,34 @@
                                 <div class="signup-form">
                                     <!-- Prescription form -->
                                     <form th:action="@{/prescribemedicine/submit}" id="prescriptionForm"
-                                        class="border p-4 bg-light shadow" method="get">
+                                        class="border p-4 bg-light shadow" method="post">
 
                                         <!-- Medication table -->
                                         <table class="table table-striped" border="1">
                                             <thead>
-                                            <tr>
-                                                <th class="text-center" scope="col">No</th>
-                                                <th class="text-center" scope="col">Medicine Name</th>
-                                                <th class="text-center" scope="col">Stock Available</th>
-                                                <th class="text-center" scope="col">Quantity</th>
-                                                <th class="text-center" scope="col">Select</th>
-                                            </tr>
+                                                <tr>
+                                                    <th class="text-center">No</th>
+                                                    <th class="text-center">Medicine Name</th>
+                                                    <th class="text-center">Stock Available</th>
+                                                    <th class="text-center">Quantity</th>
+                                                    <th class="text-center">Select</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
-                                            <!-- Iterate over medicineList -->
-                                            <tr th:each="medicine, stat : ${medicineList}">
-                                                <td class="text-center" th:text="${stat.index + 1}"></td>
-                                                <td class="text-center" th:text="${medicine.medName}"></td>
-                                                <td class="text-center" th:text="${medicine.quantity}"></td>
-                                                <td class="text-center">
-                                                    <!-- Quantity Input Form -->
-                                                    <input type="number" name="quantity_${medicine.medName}" min="1"
-                                                        class="form-control form-input text-center"
-                                                        id="medicationQuantity_${stat.index}" style="resize: none;width: 100px;">
-                                                </td>
-                                                <td class="text-center">
-                                                    <!-- Add Checkbox -->
-                                                    <input type="checkbox" name="selectedMedicines" th:value="${medicine.medName}" />
-                                                </td>
-                                            </tr>
+                                                <!-- Iterate over medicineList -->
+                                                <tr th:each="medicine, stat : ${medicineList}">
+                                                    <td class="text-center" th:text="${stat.index + 1}"></td>
+                                                    <td class="text-center" th:text="${medicine.medName}"></td>
+                                                    <td class="text-center" th:text="${medicine.quantity}"></td>
+                                                    <td class="text-center">
+                                                        <!-- Quantity Input Form -->
+                                                        <input type="number" th:name="'quantity_' + ${stat.index}" min="1" class="form-control form-input text-center" style="resize: none;width: 100px;">
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <!-- Add Checkbox -->
+                                                        <input type="checkbox" th:name="'selectedMedicines_' + ${stat.index}" />
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
 
