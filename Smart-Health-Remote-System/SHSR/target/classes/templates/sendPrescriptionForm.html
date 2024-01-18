@@ -103,22 +103,35 @@
                                     <a th:href="@{/prescription/history(patientId=${patientId})}" class="btn btn-primary rounded">Prescription History</a>
                                 </div>
                             </div>
+                            <br>
                             <div class="container mt-2">
                                 <div class="row">
                                     <div class="col-12">
                                         <!-- List of medicine is here -->
                                         <div class="mb-3 col-md-12">
-                                            <table border="1px" id="medTable">
-                                                <tr th:each="medicine, stat : ${medicineList}">
-                                                    <td th:text="${stat.count}">1</td>
-                                                    <td>
-                                                        <label th:text="${medicine.medName}"></label><br>
-                                                    </td>
-                                                    <td>
-                                                        <p th:text="${medicine.quantity}"></p>
-                                                    </td>                                    
-                                                </tr>
-                                            </table>
+                                            <table class="table table-striped" border="1" id="medTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Medicine Name</th>
+                                                            <th class="text-center">Stock Available</th>
+                                                            <th class="text-center">Select</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!-- Iterate over medicineList -->
+                                                        <tr th:each="medicine : ${medicineList}">                                                           <td class="text-center" th:text="${medicine.medName}"></td>
+                                                            <td class="text-center" th:text="${medicine.quantity}"></td>
+                                                            <td class="text-center">
+                                                                <!-- Add Checkbox -->
+                                                                <input type="checkbox" th:name="'selectedMedicines.selected'" />
+                                                                <!-- Hidden fields to store the id, name, and quantity of each selected medicine -->
+                                                                <input type="hidden" th:name="'selectedMedicines.id'" th:value="${medicine.medId}" />
+                                                                <input type="hidden" th:name="'selectedMedicines.name'" th:value="${medicine.medName}" />
+                                                                <input type="hidden" th:name="'selectedMedicines.quantity'" th:value="${medicine.quantity}" />
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                         </div>
                                     </div>
                                 </div>
