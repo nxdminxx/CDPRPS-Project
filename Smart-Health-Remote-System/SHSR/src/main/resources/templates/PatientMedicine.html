@@ -75,25 +75,26 @@
 
                 <div class="col-9">
                     <div class="singup-form">
-                        <div class="col-15">
-                            <h4 class="mb-5 form-title">Medication Prescription List</h4>
-                            <div class="row">
-                                <!-- Display patient and doctor information -->
-                                <div class="col-md-6">
-                                    <label for="patientName" class="form-label">Patient's Name</label>
-                                    <input type="text" class="form-control" id="patientName" disabled="true"
-                                           th:value="${patientName}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="doctorName" class="form-label">Doctor's Name</label>
-                                    <input type="text" class="form-control" id="doctorName" disabled="true"
-                                           th:value="${doctor.name}">
-                                </div>
-                            </div>
-    
-                            <!-- Medication Prescription Table -->
-                            <br><br>
+                        <div class="col-15 border p-4 bg-light" >
                             <div class="mb-3 col-md-12">
+                                <h4 class="mb-5 form-title">Medication Prescription List</h4>
+                                <div class="row">
+                                    <!-- Display patient and doctor information -->
+                                    <div class="col-md-6">
+                                        <label for="patientName" class="form-label">Patient's Name</label>
+                                        <input type="text" class="form-control" id="patientName" disabled="true"
+                                               th:value="${patientName}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="doctorName" class="form-label">Doctor's Name</label>
+                                        <input type="text" class="form-control" id="doctorName" disabled="true"
+                                               th:value="${doctor.name}">
+                                    </div>
+                                </div>
+        
+                                <!-- Medication Prescription Table -->
+                                <br><br>
+                                
                                 <div class="signup-form">
                                     <!-- Prescription form -->
                                     <form th:action="@{/prescribemedicine/submit}" id="prescriptionForm"
